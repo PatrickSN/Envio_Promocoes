@@ -147,12 +147,13 @@ class funcoesClientes(Funcoes):
     def envia_msg(self):
         self.msg = self.entrada_mensagem.get()
         self.conecta_BD()
+        self.cursor.execute('SELECT nome_cliente FROM clientes')
         """acesso = autoMsg.AutoBot()
         acesso.acesso()
         acesso.iniciar(self.msg)"""
-        self.saida.selection()
-        for cliente in self.saida.selection():
-            print(f"{self.msg}-{cliente}")
+        for row in self.cursor.fetchall():
+            print(f"{self.msg} - {row[0]}")
+        self.desconecta_BD()
 
 
 class Application(funcoesClientes):
@@ -352,8 +353,6 @@ class Application(funcoesClientes):
         barraMenu.add_cascade(label='Ajuda', menu=abamenu2)
 
         abamenu.add_command(label='Sair', command=Quit)
-        abamenu2.add_command(label='Ficha do Cliente',
-                             command=self.geraRelatclient)
 
 
 Application()

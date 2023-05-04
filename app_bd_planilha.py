@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import tix
-import sqlite3
+import os
 
 import autoMsg
 
@@ -19,16 +19,15 @@ class Funcoes:
         self.entrada_mensagem.delete(0, END)
 
     def conecta_BD(self):
-        baseBD = "clientes.db"
+        baseBD = "clientes.csv"
         print(f'Conectando ao Banco de Dados {baseBD}')
-        self.conexao = sqlite3.connect(baseBD)
-        self.cursor = self.conexao.cursor()
+        with open(baseBD, encoding='utf-8') as lista_Clientes:
+            self.clientes = lista_Clientes.readlines()
 
     def desconecta_BD(self):
-        self.conexao.close()
         print('Banco de Dados desconectado')
 
-    def montaTabelas(self):
+    def montaTabe(self):
         self.conecta_BD()
         # Cria tabela
         comandsql = """
