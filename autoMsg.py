@@ -19,7 +19,6 @@ class AutoBot:
             r"user-data-dir={}".format(profile))
         self.driver = webdriver.Chrome(options=options)
         # Contatos para envio de mensagem automatica
-        self.pessoas = []*3
 
     def acesso(self):
         # Acessa a pagina desejada
@@ -58,7 +57,7 @@ class AutoBot:
         ).click()
         time.sleep(1)
 
-    def iniciar(self, textos):
+    def iniciar(self, textos, base_dados):
         print('Iniciando...', datetime.now().strftime('%H %M %S'))
 
         for pessoa in self.pessoas:
@@ -72,8 +71,9 @@ class AutoBot:
         print('Finalizado!!!')
 
 
-msg = ""
 
-OnlineBot = AutoBot()
-OnlineBot.acesso()
-OnlineBot.iniciar(msg)
+if __name__ == "__main__":
+    msg = ""
+    OnlineBot = AutoBot()
+    OnlineBot.acesso()
+    OnlineBot.iniciar(msg)

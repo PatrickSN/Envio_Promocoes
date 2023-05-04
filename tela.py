@@ -10,6 +10,8 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import SimpleDocTemplate, Image
 import webbrowser
 
+import autoMsg
+
 root = Tk()
 
 
@@ -56,6 +58,7 @@ class Funcoes:
         self.entrada_data1.delete(0, END)
         self.entrada_cpf.delete(0, END)
         self.entrada_wpp.delete(0, END)
+        self.entrada_mensagem.delete(0, END)
 
     def conecta_BD(self):
         baseBD = "clientes.db"
@@ -115,6 +118,8 @@ class Funcoes:
 
         self.limpa_tela()
         self.desconecta_BD()
+
+    
 
 
 class funcoesClientes(Funcoes):
@@ -183,6 +188,16 @@ class funcoesClientes(Funcoes):
         self.seleciona_saida()
         self.limpa_tela()
 
+    def envia_msg(self):
+        self.msg = self.entrada_mensagem.get()
+        self.conecta_BD()
+        """acesso = autoMsg.AutoBot()
+        acesso.acesso()
+        acesso.iniciar(self.msg)"""
+        self.saida.selection()
+        for cliente in self.saida.selection():
+            print(f"{self.msg}-{cliente}")
+
 
 class Application(funcoesClientes, Relatorios):
     def __init__(self):
@@ -193,7 +208,7 @@ class Application(funcoesClientes, Relatorios):
         self.frames_tela_cadastro()
         self.paginas()
         self.widgets_pag_1()
-        #self.widgets_pag_2()
+        self.widgets_pag_2()
         self.output_frame_2()
         self.montaTabelas()
         self.seleciona_saida()
@@ -268,6 +283,7 @@ class Application(funcoesClientes, Relatorios):
                                 fg=self.texto_botao, font=(self.fonte_botao, self.tamanho, self.tipo), command=self.deleta_cliente)
         self.bt_apagar.place(rely=0.1, relx=0.84, relheight=0.1, relwidth=0.1)
 
+
     def widgets_pag_1(self):
         # Aba Cadastro
         self.botoes(self.aba_cadastro)
@@ -322,17 +338,24 @@ class Application(funcoesClientes, Relatorios):
 
     def widgets_pag_2(self):
         # botao limpar
-        self.bt_limpar = Button(self.aba_compras, text='Limpar', bd=2, bg=self.fundo_botao,
+        self.bt_limpar = Button(self.aba_envio, text='Limpar', bd=2, bg=self.fundo_botao,
                                 fg=self.texto_botao, font=(self.fonte_botao, self.tamanho, self.tipo), command=self.limpa_tela)
-        self.bt_limpar.place(rely=0.1, relx=0.2, relheight=0.1, relwidth=0.1)
+        self.bt_limpar.place(rely=0.9, relx=0.9, relheight=0.1, relwidth=0.1)
+
+        # botao enviar
+        self.bt_enviar = Button(self.aba_envio, text='Enviar', bd=2, bg=self.fundo_botao,
+                                fg=self.texto_botao, font=(self.fonte_botao, self.tamanho, self.tipo), command=self.envia_msg)
+        self.bt_enviar.place(rely=0.9, relx=0.7, relheight=0.1, relwidth=0.1)
+
+        #botao parar
+
 
         #entrada da mensagem a ser enviada
-        self.lb_msg = Label(self.aba_cadastro, text='Digite a mensagem a ser enviada: ',
+        self.lb_msg = Label(self.aba_envio, text='Digite a mensagem a ser enviada: ',
                            bg=self.fundo, font=(self.fonte_texto, self.tamanho))
-        self.lb_msg.place(rely=0.025, relx=0.01)
-        self.entrada_mensagem = Entry(self.aba_cadastro)
-        self.entrada_mensagem.place(rely=0.1, relx=0.01,
-                              relheight=0.1, relwidth=0.15)
+        self.lb_msg.place(rely=0.05, relx=0.01)
+        self.entrada_mensagem = Entry(self.aba_envio)
+        self.entrada_mensagem.place(rely=0.15, relx=0.01, relheight=0.7, relwidth=0.93)
 
     def output_frame_2(self):
         self.saida = ttk.Treeview(self.frame_2, height=1, columns=(
