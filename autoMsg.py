@@ -56,15 +56,16 @@ class AutoBot:
             value='button[aria-label="Enviar"]'
         ).click()
         time.sleep(1)
+        campo_comentario.send_keys(Keys.ESCAPE)
 
     def iniciar(self, textos,base_dados):
         print('Iniciando...', datetime.now().strftime('%H %M %S'))
 
-        for pessoa in self.pessoas:
+        for pessoa in base_dados:
             time.sleep(5)
-            self.pesquisa(pessoa)
+            self.pesquisa(pessoa[1])
             self.comenta(textos)
-            print(pessoa, "-", datetime.now().strftime('%H %M %S'))
+            print(pessoa[1], "-", datetime.now().strftime('%H %M %S'))
             time.sleep(20)
 
         self.driver.close()
@@ -73,7 +74,8 @@ class AutoBot:
 
 
 if __name__ == "__main__":
-    msg = ""
+    msg = "teste"
+    pessoa = ["Lucas Patrick", "Entregas por fora"]
     OnlineBot = AutoBot()
     OnlineBot.acesso()
-    OnlineBot.iniciar(msg)
+    OnlineBot.iniciar(msg, pessoa)

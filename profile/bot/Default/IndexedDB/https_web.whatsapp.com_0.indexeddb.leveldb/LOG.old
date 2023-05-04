@@ -1,17 +1,3 @@
-2023/05/04-00:33:21.950 23ac Reusing MANIFEST C:\Users\lucas\Documents\App sp-MsG\profile\bot\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
-2023/05/04-00:33:21.950 23ac Recovering log #4
-2023/05/04-00:33:21.951 23ac Reusing old log C:\Users\lucas\Documents\App sp-MsG\profile\bot\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000004.log 
-2023/05/04-00:33:22.489 3484 Level-0 table #8: started
-2023/05/04-00:33:22.491 3484 Level-0 table #8: 9022 bytes OK
-2023/05/04-00:33:22.492 3484 Delete type=0 #4
-2023/05/04-00:33:22.492 23ac Manual compaction at level-0 from '\x00\x04\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x05\x00\x00\x00' @ 0 : 0; will stop at (end)
-2023/05/04-00:33:22.503 23ac Level-0 table #10: started
-2023/05/04-00:33:22.505 23ac Level-0 table #10: 1920 bytes OK
-2023/05/04-00:33:22.506 23ac Delete type=0 #7
-2023/05/04-00:33:22.506 23ac Manual compaction at level-0 from '\x00\x03\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x04\x00\x00\x00' @ 0 : 0; will stop at '\x00\x03\x04\x02\x01\x0e\x00w\x00h\x00a\x00t\x00s\x00a\x00p\x00p\x00-\x00m\x00u\x00t\x00e\x00x' @ 1598 : 0
-2023/05/04-00:33:22.506 23ac Compacting 1@0 + 1@1 files
-2023/05/04-00:33:22.508 23ac Generated table #11@0: 288 keys, 3054 bytes
-2023/05/04-00:33:22.508 23ac Compacted 1@0 + 1@1 files => 3054 bytes
-2023/05/04-00:33:22.508 23ac compacted to: files[ 0 1 1 0 0 0 0 ]
-2023/05/04-00:33:22.509 23ac Delete type=2 #10
-2023/05/04-00:33:22.509 23ac Manual compaction at level-0 from '\x00\x03\x04\x02\x01\x0e\x00w\x00h\x00a\x00t\x00s\x00a\x00p\x00p\x00-\x00m\x00u\x00t\x00e\x00x' @ 1598 : 0 .. '\x00\x04\x00\x00\x00' @ 0 : 0; will stop at (end)
+2023/05/04-02:08:46.471 5f8 Reusing MANIFEST C:\Users\lucas\Documents\App sp-MsG\profile\bot\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2023/05/04-02:08:46.472 5f8 Recovering log #57
+2023/05/04-02:08:46.479 5f8 Reusing old log C:\Users\lucas\Documents\App sp-MsG\profile\bot\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000057.log 

@@ -56,6 +56,7 @@ class Funcoes:
 
         for i in lista:
             self.saida.insert("", END, values=i)
+        print(self.saida)
 
         self.desconecta_BD()
 
@@ -147,12 +148,13 @@ class funcoesClientes(Funcoes):
     def envia_msg(self):
         self.msg = self.entrada_mensagem.get()
         self.conecta_BD()
-        self.cursor.execute('SELECT nome_cliente FROM clientes')
-        """acesso = autoMsg.AutoBot()
+        clientes = self.cursor.execute("""
+        SELECT id, nome_cliente, email, primeira_comp, cpf, telefone FROM clientes
+        ORDER BY nome_cliente ASC;
+        """)
+        acesso = autoMsg.AutoBot()
         acesso.acesso()
-        acesso.iniciar(self.msg)"""
-        for row in self.cursor.fetchall():
-            print(f"{self.msg} - {row[0]}")
+        acesso.iniciar(self.msg, clientes)
         self.desconecta_BD()
 
 
@@ -189,8 +191,8 @@ class Application(funcoesClientes):
     def tela(self):
         self.root.title('Envio de Promoções')
         self.root.configure(background=self.fundo_tela)
-        self.root.geometry('1128x550')
-        self.root.minsize(width=700, height=500)
+        self.root.geometry('1280x1024')
+        self.root.minsize(width=800, height=600)
 
     def frames_tela_cadastro(self):
         self.frame_1 = Frame(self.root, bd=4, bg=self.fundo,
@@ -315,20 +317,22 @@ class Application(funcoesClientes):
 
     def output_frame_2(self):
         self.saida = ttk.Treeview(self.frame_2, height=1, columns=(
-            'col1', 'col2', 'col3', 'col4', 'col5'))
+            'col1', 'col2', 'col3', 'col4', 'col5', 'col6'))
         self.saida.heading('#0', text='')
         self.saida.heading('#1', text='Id')
         self.saida.heading('#2', text='Nome')
         self.saida.heading('#3', text='WhatsApp')
-        self.saida.heading('#4', text='Cidade')
-        self.saida.heading('#5', text='Endereço')
+        self.saida.heading('#4', text='E-mail')
+        self.saida.heading('#5', text='Cpf')
+        self.saida.heading('#6', text='1º Compra')
 
         self.saida.column('#0', width=0)
         self.saida.column('#1', width=5)
         self.saida.column('#2', width=200)
         self.saida.column('#3', width=50)
-        self.saida.column('#4', width=50)
-        self.saida.column('#5', width=250)
+        self.saida.column('#4', width=250)
+        self.saida.column('#5', width=50)
+        self.saida.column('#6', width=50)
 
         self.saida.place(rely=0.1, relx=0.01, relheight=0.85, relwidth=0.95)
 
