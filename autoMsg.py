@@ -57,7 +57,7 @@ class AutoBot:
         ).click()
         time.sleep(1)
 
-    def iniciar(self, textos, base_dados):
+    def iniciar(self, textos,base_dados):
         print('Iniciando...', datetime.now().strftime('%H %M %S'))
 
         for pessoa in self.pessoas:
