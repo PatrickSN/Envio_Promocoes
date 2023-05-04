@@ -193,7 +193,7 @@ class Application(funcoesClientes, Relatorios):
         self.frames_tela_cadastro()
         self.paginas()
         self.widgets_pag_1()
-        self.widgets_pag_2()
+        #self.widgets_pag_2()
         self.output_frame_2()
         self.montaTabelas()
         self.seleciona_saida()
@@ -215,7 +215,7 @@ class Application(funcoesClientes, Relatorios):
         self.tipo = tipo
 
     def tela(self):
-        self.root.title('Cadastro de Clientes')
+        self.root.title('Envio de Promoções')
         self.root.configure(background=self.fundo_tela)
         self.root.geometry('1128x550')
         self.root.minsize(width=700, height=500)
@@ -232,13 +232,13 @@ class Application(funcoesClientes, Relatorios):
     def paginas(self):
         self.abas = ttk.Notebook(self.frame_1)
         self.aba_cadastro = Frame(self.abas)
-        self.aba_compras = Frame(self.abas)
+        self.aba_envio = Frame(self.abas)
 
         self.aba_cadastro.configure(background=self.fundo)
-        self.aba_compras.configure(background=self.fundo)
+        self.aba_envio.configure(background=self.fundo)
 
         self.abas.add(self.aba_cadastro, text='Cadastro')
-        self.abas.add(self.aba_compras, text='Compras')
+        self.abas.add(self.aba_envio, text='Envio')
 
         self.abas.place(rely=0, relx=0, relheight=0.98, relwidth=1)
 
@@ -325,6 +325,14 @@ class Application(funcoesClientes, Relatorios):
         self.bt_limpar = Button(self.aba_compras, text='Limpar', bd=2, bg=self.fundo_botao,
                                 fg=self.texto_botao, font=(self.fonte_botao, self.tamanho, self.tipo), command=self.limpa_tela)
         self.bt_limpar.place(rely=0.1, relx=0.2, relheight=0.1, relwidth=0.1)
+
+        #entrada da mensagem a ser enviada
+        self.lb_msg = Label(self.aba_cadastro, text='Digite a mensagem a ser enviada: ',
+                           bg=self.fundo, font=(self.fonte_texto, self.tamanho))
+        self.lb_msg.place(rely=0.025, relx=0.01)
+        self.entrada_mensagem = Entry(self.aba_cadastro)
+        self.entrada_mensagem.place(rely=0.1, relx=0.01,
+                              relheight=0.1, relwidth=0.15)
 
     def output_frame_2(self):
         self.saida = ttk.Treeview(self.frame_2, height=1, columns=(
