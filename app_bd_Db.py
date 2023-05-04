@@ -3,51 +3,9 @@ from tkinter import ttk
 from tkinter import tix
 import sqlite3
 
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter, A4
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.platypus import SimpleDocTemplate, Image
-import webbrowser
-
 import autoMsg
 
 root = Tk()
-
-
-class Relatorios:
-    def print_cliente(self):
-        webbrowser.open('relatório.pdf')
-
-    def geraRelatclient(self):
-        self.canvasRel = canvas.Canvas('relatório.pdf')
-
-        self.idRel = self.entrada_id.get()
-        self.nomeRel = self.entrada_nome.get()
-        self.wppRel = self.entrada_wpp.get()
-        self.cidadeRel = self.entrada_cidade.get()
-        self.enderecoRel = self.entrada_endereco.get()
-
-        self.canvasRel.setFont('Helvetica-Bold', 24)
-        self.canvasRel.drawString(200, 790, 'Ficha do Cliente')
-
-        self.canvasRel.setFont('Helvetica-Bold', 18)
-        self.canvasRel.drawString(50, 700, 'Id: ')
-        self.canvasRel.drawString(50, 670, 'Nome: ')
-        self.canvasRel.drawString(50, 640, 'Whatsapp: ')
-        self.canvasRel.drawString(50, 610, 'Endereço: ')
-        self.canvasRel.drawString(50, 580, 'Cidade: ')
-
-        self.canvasRel.setFont('Helvetica', 18)
-        self.canvasRel.drawString(150, 700, self.idRel)
-        self.canvasRel.drawString(150, 670, self.nomeRel)
-        self.canvasRel.drawString(150, 640, self.wppRel)
-        self.canvasRel.drawString(150, 610, self.enderecoRel)
-        self.canvasRel.drawString(150, 580, self.cidadeRel)
-
-        self.canvasRel.showPage()
-        self.canvasRel.save()
-        self.print_cliente()
 
 
 class Funcoes:
@@ -118,8 +76,6 @@ class Funcoes:
 
         self.limpa_tela()
         self.desconecta_BD()
-
-    
 
 
 class funcoesClientes(Funcoes):
@@ -199,7 +155,7 @@ class funcoesClientes(Funcoes):
             print(f"{self.msg}-{cliente}")
 
 
-class Application(funcoesClientes, Relatorios):
+class Application(funcoesClientes):
     def __init__(self):
         self.root = root
         self.personalisacao()
@@ -283,7 +239,6 @@ class Application(funcoesClientes, Relatorios):
                                 fg=self.texto_botao, font=(self.fonte_botao, self.tamanho, self.tipo), command=self.deleta_cliente)
         self.bt_apagar.place(rely=0.1, relx=0.84, relheight=0.1, relwidth=0.1)
 
-
     def widgets_pag_1(self):
         # Aba Cadastro
         self.botoes(self.aba_cadastro)
@@ -314,7 +269,7 @@ class Application(funcoesClientes, Relatorios):
 
         # CPF
         self.lb_cpf = Label(self.aba_cadastro, text='CPF',
-                              bg=self.fundo, font=(self.fonte_texto, self.tamanho))
+                            bg=self.fundo, font=(self.fonte_texto, self.tamanho))
         self.lb_cpf.place(rely=0.425, relx=0.25)
         self.entrada_cpf = Entry(self.aba_cadastro)
         self.entrada_cpf.place(
@@ -347,15 +302,15 @@ class Application(funcoesClientes, Relatorios):
                                 fg=self.texto_botao, font=(self.fonte_botao, self.tamanho, self.tipo), command=self.envia_msg)
         self.bt_enviar.place(rely=0.9, relx=0.7, relheight=0.1, relwidth=0.1)
 
-        #botao parar
+        # botao parar
 
-
-        #entrada da mensagem a ser enviada
+        # entrada da mensagem a ser enviada
         self.lb_msg = Label(self.aba_envio, text='Digite a mensagem a ser enviada: ',
-                           bg=self.fundo, font=(self.fonte_texto, self.tamanho))
+                            bg=self.fundo, font=(self.fonte_texto, self.tamanho))
         self.lb_msg.place(rely=0.05, relx=0.01)
         self.entrada_mensagem = Entry(self.aba_envio)
-        self.entrada_mensagem.place(rely=0.15, relx=0.01, relheight=0.7, relwidth=0.93)
+        self.entrada_mensagem.place(
+            rely=0.15, relx=0.01, relheight=0.7, relwidth=0.93)
 
     def output_frame_2(self):
         self.saida = ttk.Treeview(self.frame_2, height=1, columns=(
@@ -390,13 +345,11 @@ class Application(funcoesClientes, Relatorios):
         self.root.config(menu=barraMenu)
         abamenu = Menu(barraMenu)
         abamenu2 = Menu(barraMenu)
-        abamenu3 = Menu(barraMenu)
 
         def Quit(): self.root.destroy()
 
         barraMenu.add_cascade(label='Opções', menu=abamenu)
-        barraMenu.add_cascade(label='Relatórios', menu=abamenu2)
-        barraMenu.add_cascade(label='Ajuda', menu=abamenu3)
+        barraMenu.add_cascade(label='Ajuda', menu=abamenu2)
 
         abamenu.add_command(label='Sair', command=Quit)
         abamenu2.add_command(label='Ficha do Cliente',
