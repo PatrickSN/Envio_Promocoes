@@ -7,6 +7,37 @@ import time
 import os
 
 
+"""
+AutoBot
+A classe AutoBot é responsável por automatizar o envio de mensagens no 
+WhatsApp Web.
+
+__init__()
+    O método __init__() é o construtor da classe, que define as configurações do 
+    Google Chrome e inicializa o driver.
+
+acesso()
+    O método acesso() acessa a página do WhatsApp Web e aguarda até que a página 
+    esteja carregada.
+
+pesquisa(nome)
+    O método pesquisa(nome) pesquisa um contato no campo de pesquisa do WhatsApp 
+    Web e seleciona o contato correspondente.
+
+comenta(mensagem)
+    O método comenta(mensagem) escreve uma mensagem para o contato selecionado e 
+    envia a mensagem.
+
+iniciar(textos,base_dados)
+    O método iniciar(textos,base_dados) inicia o envio de mensagens para a lista 
+    de contatos fornecida.
+
+Parâmetros
+    textos (string): Mensagem a ser enviada para os contatos
+    base_dados (list): Lista de contatos a serem enviados
+"""
+
+
 class AutoBot:
     def __init__(self):
         # Configurações do google
@@ -58,7 +89,7 @@ class AutoBot:
         time.sleep(1)
         campo_comentario.send_keys(Keys.ESCAPE)
 
-    def iniciar(self, textos,base_dados):
+    def iniciar(self, textos, base_dados):
         print('Iniciando...', datetime.now().strftime('%H %M %S'))
 
         for pessoa in base_dados:
@@ -68,9 +99,11 @@ class AutoBot:
             print(pessoa[1], "-", datetime.now().strftime('%H %M %S'))
             time.sleep(20)
 
+        self.finaliza()
+    
+    def finaliza(self):
         self.driver.close()
         print('Finalizado!!!')
-
 
 
 if __name__ == "__main__":

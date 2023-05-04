@@ -12,6 +12,7 @@ root = Tk()
 
 class Funcoes:
     def limpa_tela(self):
+        """Este método limpa os campos de entrada na interface gráfica."""
         self.entrada_id.delete(0, END)
         self.entrada_nome.delete(0, END)
         self.entrada_email.delete(0, END)
@@ -21,16 +22,20 @@ class Funcoes:
         self.entrada_mensagem.delete(0, END)
 
     def conecta_BD(self):
+        """Este método conecta-se ao banco de dados SQLite."""
         baseBD = "clientes.db"
         print(f'Conectando ao Banco de Dados {baseBD}')
         self.conexao = sqlite3.connect(baseBD)
         self.cursor = self.conexao.cursor()
 
     def desconecta_BD(self):
+        """Este método desconecta-se ao banco de dados SQLite."""
         self.conexao.close()
         print('Banco de Dados desconectado')
 
     def montaTabelas(self):
+        """Este método cria uma tabela chamada clientes no banco de dados, 
+        se ela ainda não existir."""
         self.conecta_BD()
         # Cria tabela
         comandsql = """
@@ -48,6 +53,8 @@ class Funcoes:
         self.desconecta_BD()
 
     def seleciona_saida(self, comandsql=None):
+        """Este método executa uma consulta SQL para selecionar informações 
+        de clientes do banco de dados e exibi-las na interface gráfica."""
         self.saida.delete(*self.saida.get_children())
         self.conecta_BD()
         comandsql = """
@@ -61,6 +68,9 @@ class Funcoes:
         self.desconecta_BD()
 
     def buscar(self):
+        """Ele executa uma consulta SQL para buscar informações de clientes com base 
+        no nome inserido no campo de entrada entrada_nome na interface gráfica. 
+        Os resultados da consulta são exibidos na interface gráfica."""
         self.conecta_BD()
         self.saida.delete(*self.saida.get_children())
 
@@ -81,23 +91,26 @@ class Funcoes:
 
 class Up_Down(Funcoes):
     def open(self):
+        """ Este método usa o módulo filedialog do Tkinter para abrir uma caixa de diálogo
+          e permitir que o usuário selecione um arquivo.
+
+        """
         self.save_path = "C:/Users/lucas/Documents/App sp-MsG/"
-        root.filename = filedialog.askopenfilename(initialdir="C:/Users/lucas/Documents/App sp-MsG/", title="Selecione um arquivo", filetypes=(
-            ("db files", "csv files"), ("all files", "*.*")))
-        my_label = Label(root, text=root.filename)
-        my_label.place(x=260, y=140)
+        root.filename = filedialog.askopenfilename(initialdir="C:/Users/lucas/Documents/App sp-MsG/",
+                                                   title="Selecione um arquivo", filetypes=(
+                                                       ('all files', '*.*'),
+                                                       ('db files', '*.db'),
+                                                       ('csv files', '*.csv')))
         self.caminho = os.path.join(
             self.save_path, os.path.basename(root.filename))
 
-    def verifica(self,nome):
-        self.conecta_BD()
+    def verifica(self, nome):
+        """Este método verifica se um nome específico já existe no banco de dados."""
         lista = self.cursor.execute("""
         SELECT nome_cliente FROM clientes
         ORDER BY nome_cliente asc;
         """)
-        print('print- ',nome)
         for row in lista.fetchall():
-            print('teste- ',row[0])
             if nome == row[0]:
                 print(f"{nome} já existe no banco de dados!!!")
                 return False
@@ -105,6 +118,9 @@ class Up_Down(Funcoes):
             return True
 
     def Upload(self):
+        """
+        Este método carrega dados de clientes de um arquivo e os adiciona ao banco de dados.
+        """
         self.open()
         self.conecta_BD()
         with open(self.caminho, encoding='utf-8') as lista_clientes:
@@ -124,13 +140,15 @@ class Up_Down(Funcoes):
                             )
                             self.conexao.commit()
                     except:
-                        print(f'{cliente[0]} não foi adicionado com sucesso!!!')
+                        print(
+                            f'{cliente[0]} não foi adicionado com sucesso!!!')
         self.desconecta_BD()
         self.seleciona_saida()
 
 
 class funcoesClientes(Funcoes):
     def variaveis_clientes(self):
+        """Atribui os valores inseridos nos campos de entrada a variáveis correspondentes."""
         self.id = self.entrada_id.get()
         self.nome = self.entrada_nome.get()
         self.email = self.entrada_email.get()
@@ -139,6 +157,7 @@ class funcoesClientes(Funcoes):
         self.telefone = self.entrada_wpp.get()
 
     def add_cliente(self):
+        """Insere um novo cliente na tabela "clientes" do banco de dados, caso o nome e o telefone não estejam vazios."""
         self.variaveis_clientes()
         self.conecta_BD()
         if self.nome != '' and self.telefone != '':
@@ -169,6 +188,7 @@ class funcoesClientes(Funcoes):
             self.entrada_wpp.insert(END, col6)
 
     def deleta_cliente(self):
+        """Exclui um cliente da tabela "clientes" do banco de dados, com base em seu ID"""
         self.variaveis_clientes()
         self.conecta_BD()
 
@@ -183,6 +203,7 @@ class funcoesClientes(Funcoes):
         self.seleciona_saida()
 
     def editar_cliente(self):
+        """Atualiza as informações de um cliente na tabela "clientes" do banco de dados, com base em seu ID."""
         self.variaveis_clientes()
         self.conecta_BD()
         self.cursor.execute("""
@@ -196,6 +217,7 @@ class funcoesClientes(Funcoes):
         self.limpa_tela()
 
     def envia_msg(self):
+        """Envia uma mensagem para todos os clientes na tabela "clientes" do banco de dados, usando a classe "autoMsg"."""
         self.msg = self.entrada_mensagem.get()
         self.conecta_BD()
         clientes = self.cursor.execute("""
@@ -210,6 +232,9 @@ class funcoesClientes(Funcoes):
 
 class Application(funcoesClientes, Up_Down):
     def __init__(self):
+        """Construtor da classe que inicializa a aplicação, definindo os métodos
+        de personalização da tela, criação de widgets e seleção de saída. 
+        Por fim, inicia o loop principal da aplicação."""
         self.root = root
         self.personalisacao()
         self.tela()
@@ -226,9 +251,10 @@ class Application(funcoesClientes, Up_Down):
     def personalisacao(self, fundo_tela='#353578', fundo='#cecef5',
                        fundo_botao='#4545ff', borda='#6262d9', cor_texto_botao='#ffffff',
                        tamanho_texto=8, fonte_botao='arial black', fonte_texto='verdana', tipo='bold'):
-        # configura as cores e personalisaçoes da tela
+        # Método que personaliza a aparência da tela da aplicação
         self.fundo_tela = fundo_tela
         self.fundo = fundo
+
         self.borda = borda
         self.fundo_botao = fundo_botao
         self.texto_botao = cor_texto_botao
@@ -239,12 +265,14 @@ class Application(funcoesClientes, Up_Down):
         self.tipo = tipo
 
     def tela(self):
+        # Define as características básicas da janela da aplicação
         self.root.title('Envio de Promoções')
         self.root.configure(background=self.fundo_tela)
         self.root.geometry('1280x1024')
         self.root.minsize(width=800, height=600)
 
     def frames_tela_cadastro(self):
+        #Cria os frames que irao aparecer na tela
         self.frame_1 = Frame(self.root, bd=4, bg=self.fundo,
                              highlightbackground=self.borda, highlightthickness=3)
         self.frame_1.place(rely=0.02, relx=0.02, relheight=0.46, relwidth=0.96)
@@ -254,6 +282,7 @@ class Application(funcoesClientes, Up_Down):
         self.frame_2.place(rely=0.5, relx=0.02, relheight=0.46, relwidth=0.96)
 
     def paginas(self):
+        #cria as abas da aplicaçao
         self.abas = ttk.Notebook(self.frame_1)
         self.aba_cadastro = Frame(self.abas)
         self.aba_envio = Frame(self.abas)
@@ -293,7 +322,7 @@ class Application(funcoesClientes, Up_Down):
         self.bt_apagar.place(rely=0.1, relx=0.84, relheight=0.1, relwidth=0.1)
 
     def widgets_pag_1(self):
-        # Aba Cadastro
+        # Cria os widgets da aba de cadastro
         self.botoes(self.aba_cadastro)
         # ____Entradas e labels do frame_1
         # ID
@@ -345,6 +374,7 @@ class Application(funcoesClientes, Up_Down):
             rely=0.7, relx=0.01, relheight=0.1, relwidth=0.73)
 
     def widgets_pag_2(self):
+        # Cria os widgets da aba de envio de mensagens
         # botao limpar
         self.bt_limpar = Button(self.aba_envio, text='Limpar', bd=2, bg=self.fundo_botao,
                                 fg=self.texto_botao, font=(self.fonte_botao, self.tamanho, self.tipo), command=self.limpa_tela)
@@ -366,6 +396,7 @@ class Application(funcoesClientes, Up_Down):
             rely=0.15, relx=0.01, relheight=0.7, relwidth=0.93)
 
     def output_frame_2(self):
+        # retorno do banco de dados
         # nome_cliente, email, primeira_comp, cpf, telefone
         self.saida = ttk.Treeview(self.frame_2, height=1, columns=(
             'col1', 'col2', 'col3', 'col4', 'col5', 'col6'))
@@ -407,8 +438,9 @@ class Application(funcoesClientes, Up_Down):
         barraMenu.add_cascade(label='Opções', menu=abamenu)
         barraMenu.add_cascade(label='Ajuda', menu=abamenu2)
 
-        abamenu.add_command(label='Sair', command=Quit)
         abamenu.add_command(label='Upload', command=self.Upload)
+        abamenu.add_command(label='Donwload')
+        abamenu.add_command(label='Sair', command=Quit)
         abamenu2.add_command(label='Modo de Usar', command=Quit)
 
 
