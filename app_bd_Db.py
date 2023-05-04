@@ -1,9 +1,11 @@
 from tkinter import *
 from tkinter import ttk
-from tkinter import tix
+from tkinter import filedialog
 import sqlite3
 
 import autoMsg
+import os
+import os.path
 
 root = Tk()
 
@@ -50,14 +52,12 @@ class Funcoes:
         self.conecta_BD()
         comandsql = """
         SELECT id, nome_cliente, email, primeira_comp, cpf, telefone FROM clientes
-        ORDER BY nome_cliente ASC;
+        ORDER BY id ASC;
         """
         lista = self.cursor.execute(comandsql)
 
         for i in lista:
             self.saida.insert("", END, values=i)
-        print(self.saida)
-
         self.desconecta_BD()
 
     def buscar(self):
@@ -77,6 +77,56 @@ class Funcoes:
 
         self.limpa_tela()
         self.desconecta_BD()
+
+
+class Up_Down(Funcoes):
+    def open(self):
+        self.save_path = "C:/Users/lucas/Documents/App sp-MsG/"
+        root.filename = filedialog.askopenfilename(initialdir="C:/Users/lucas/Documents/App sp-MsG/", title="Selecione um arquivo", filetypes=(
+            ("db files", "csv files"), ("all files", "*.*")))
+        my_label = Label(root, text=root.filename)
+        my_label.place(x=260, y=140)
+        self.caminho = os.path.join(
+            self.save_path, os.path.basename(root.filename))
+
+    def verifica(self,nome):
+        self.conecta_BD()
+        lista = self.cursor.execute("""
+        SELECT nome_cliente FROM clientes
+        ORDER BY nome_cliente asc;
+        """)
+        print('print- ',nome)
+        for row in lista.fetchall():
+            print('teste- ',row[0])
+            if nome == row[0]:
+                print(f"{nome} já existe no banco de dados!!!")
+                return False
+        else:
+            return True
+
+    def Upload(self):
+        self.open()
+        self.conecta_BD()
+        with open(self.caminho, encoding='utf-8') as lista_clientes:
+            clientes = lista_clientes.readlines()
+            for cliente in clientes:
+                if cliente == clientes[0]:
+                    pass
+                else:
+                    try:
+                        cliente = cliente.split(";")
+                        if cliente[0] != '' and cliente[4] != '' and self.verifica(cliente[0]):
+                            print('ent')
+                            self.cursor.execute("""
+                                INSERT INTO clientes (nome_cliente, email, primeira_comp, cpf, telefone)
+                                VALUES (?, ?, ?, ?, ?)
+                            """, (cliente[0], cliente[1], cliente[2], cliente[3], cliente[4])
+                            )
+                            self.conexao.commit()
+                    except:
+                        print(f'{cliente[0]} não foi adicionado com sucesso!!!')
+        self.desconecta_BD()
+        self.seleciona_saida()
 
 
 class funcoesClientes(Funcoes):
@@ -158,7 +208,7 @@ class funcoesClientes(Funcoes):
         self.desconecta_BD()
 
 
-class Application(funcoesClientes):
+class Application(funcoesClientes, Up_Down):
     def __init__(self):
         self.root = root
         self.personalisacao()
@@ -316,21 +366,22 @@ class Application(funcoesClientes):
             rely=0.15, relx=0.01, relheight=0.7, relwidth=0.93)
 
     def output_frame_2(self):
+        # nome_cliente, email, primeira_comp, cpf, telefone
         self.saida = ttk.Treeview(self.frame_2, height=1, columns=(
             'col1', 'col2', 'col3', 'col4', 'col5', 'col6'))
         self.saida.heading('#0', text='')
         self.saida.heading('#1', text='Id')
         self.saida.heading('#2', text='Nome')
-        self.saida.heading('#3', text='WhatsApp')
-        self.saida.heading('#4', text='E-mail')
+        self.saida.heading('#3', text='E-mail')
+        self.saida.heading('#4', text='1º Compra')
         self.saida.heading('#5', text='Cpf')
-        self.saida.heading('#6', text='1º Compra')
+        self.saida.heading('#6', text='Whatsapp')
 
         self.saida.column('#0', width=0)
         self.saida.column('#1', width=5)
         self.saida.column('#2', width=200)
-        self.saida.column('#3', width=50)
-        self.saida.column('#4', width=250)
+        self.saida.column('#3', width=250)
+        self.saida.column('#4', width=50)
         self.saida.column('#5', width=50)
         self.saida.column('#6', width=50)
 
@@ -357,6 +408,8 @@ class Application(funcoesClientes):
         barraMenu.add_cascade(label='Ajuda', menu=abamenu2)
 
         abamenu.add_command(label='Sair', command=Quit)
+        abamenu.add_command(label='Upload', command=self.Upload)
+        abamenu2.add_command(label='Modo de Usar', command=Quit)
 
 
 Application()
