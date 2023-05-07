@@ -43,10 +43,13 @@ class Funcoes:
                 id INTEGER PRIMARY KEY,
                 nome_cliente CHAR(200) not null,
                 email CHAR(100),
-                primeira_comp CHAR(15),
+                nascimento CHAR(20),
+                cpf INT(11),
                 telefone INT(20) not null,
-                cpf INT(11)
-            );
+                ultima_comp CHAR(15),
+                pedidos INT(5),
+                satisfacao INT(2)
+                );
             """
         self.cursor.execute(comandsql)
         self.conexao.commit()
@@ -58,9 +61,9 @@ class Funcoes:
         self.saida.delete(*self.saida.get_children())
         self.conecta_BD()
         comandsql = """
-        SELECT id, nome_cliente, email, primeira_comp, cpf, telefone FROM clientes
-        ORDER BY id ASC;
-        """
+            SELECT id, nome_cliente, email, nascimento, cpf, telefone, ultima_comp, pedidos, satisfacao FROM clientes
+            ORDER BY id ASC;
+            """
         lista = self.cursor.execute(comandsql)
 
         for i in lista:
@@ -77,7 +80,7 @@ class Funcoes:
         self.entrada_nome.insert(END, '%')
         nome = self.entrada_nome.get()
         self.cursor.execute("""
-            SELECT id, nome_cliente, email, primeira_comp, cpf, telefone FROM clientes
+            SELECT id, nome_cliente, email, nascimento, cpf, telefone, ultima_comp, pedidos, satisfacao FROM clientes
             WHERE nome_cliente LIKE '%s' ORDER BY nome_cliente ASC
         """ % nome
                             )
@@ -129,19 +132,21 @@ class Up_Down(Funcoes):
                 if cliente == clientes[0]:
                     pass
                 else:
-                    try:
-                        cliente = cliente.split(";")
-                        if cliente[0] != '' and cliente[4] != '' and self.verifica(cliente[0]):
-                            print('ent')
-                            self.cursor.execute("""
-                                INSERT INTO clientes (nome_cliente, email, primeira_comp, cpf, telefone)
-                                VALUES (?, ?, ?, ?, ?)
-                            """, (cliente[0], cliente[1], cliente[2], cliente[3], cliente[4])
-                            )
-                            self.conexao.commit()
-                    except:
-                        print(
-                            f'{cliente[0]} não foi adicionado com sucesso!!!')
+                    cliente = cliente.split(";")
+                    if self.verifica(cliente[0]):
+                        self.cursor.execute("""
+                            INSERT INTO clientes (nome_cliente, email, nascimento, cpf, telefone, ultima_comp, pedidos, satisfacao)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        """, (cliente[0], cliente[1], cliente[2], cliente[3], cliente[4], cliente[5], cliente[6], cliente[7])
+                        )
+                    else:
+                        self.cursor.execute("""
+                            UPDATE clientes SET email = ?, nascimento = ?, cpf = ?, telefone = ?, ultima_comp = ?, pedidos = ?, satisfacao = ?
+                            WHERE nome_cliente = ?
+                        """, (cliente[1], cliente[2], cliente[3], cliente[4], cliente[5], cliente[6], cliente[7], cliente[0])
+                        )
+                        print("contato atualizado")
+        self.conexao.commit()        
         self.desconecta_BD()
         self.seleciona_saida()
 
@@ -152,9 +157,12 @@ class funcoesClientes(Funcoes):
         self.id = self.entrada_id.get()
         self.nome = self.entrada_nome.get()
         self.email = self.entrada_email.get()
-        self.pri_comp = self.entrada_data1.get()
+        self.pri_comp = self.entrada_nasc.get()
         self.cpf = self.entrada_cpf.get()
         self.telefone = self.entrada_wpp.get()
+        self.data = self.entrada_data.get()
+        self.pedidos = self.entrada_pedidos.get()
+        self.satis = self.entrada_satis.get()
 
     def add_cliente(self):
         """Insere um novo cliente na tabela "clientes" do banco de dados, caso o nome e o telefone não estejam vazios."""
@@ -162,10 +170,10 @@ class funcoesClientes(Funcoes):
         self.conecta_BD()
         if self.nome != '' and self.telefone != '':
             self.cursor.execute("""
-                INSERT INTO clientes (nome_cliente, email, primeira_comp, cpf, telefone)
-                VALUES (?, ?, ?, ?, ?)
-            """, (self.nome, self.email, self.pri_comp, self.cpf, self.telefone)
-            )
+                INSERT INTO clientes (nome_cliente, email, nascimento, cpf, telefone, ultima_comp, pedidos, satisfacao)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                            """, self.nome, self.email, self.nasc, self.cpf, self.wpp, self.data, self.pedidos, self.satis
+                                )
             self.conexao.commit()
             self.desconecta_BD()
             self.seleciona_saida()
@@ -179,13 +187,17 @@ class funcoesClientes(Funcoes):
         self.saida.selection()
 
         for i in self.saida.selection():
-            col1, col2, col3, col4, col5, col6 = self.saida.item(i, 'values')
+            col1, col2, col3, col4, col5, col6, col7, col8, col9 = self.saida.item(
+                i, 'values')
             self.entrada_id.insert(END, col1)
             self.entrada_nome.insert(END, col2)
             self.entrada_email.insert(END, col3)
-            self.entrada_data1.insert(END, col4)
+            self.entrada_nasc.insert(END, col4)
             self.entrada_cpf.insert(END, col5)
             self.entrada_wpp.insert(END, col6)
+            self.entrada_data.insert(END, col7)
+            self.entrada_pedidos.insert(END, col8)
+            self.entrada_satis.insert(END, col9)
 
     def deleta_cliente(self):
         """Exclui um cliente da tabela "clientes" do banco de dados, com base em seu ID"""
@@ -207,9 +219,9 @@ class funcoesClientes(Funcoes):
         self.variaveis_clientes()
         self.conecta_BD()
         self.cursor.execute("""
-            UPDATE clientes SET nome_cliente = ?, email = ?, primeira_comp = ?, cpf = ?, telefone = ?
+            UPDATE clientes SET nome_cliente = ?, email = ?, nascimento = ?, cpf = ?, telefone = ?, ultima_comp = ?, pedidos = ?, satisfacao = ?
             WHERE id = ?
-        """, (self.nome, self.email, self.pri_comp, self.cpf, self.telefone, self.id)
+        """, (self.nome, self.email, self.nasc, self.cpf, self.wpp, self.data, self.pedidos, self.satis, self.id)
         )
         self.conexao.commit()
         self.desconecta_BD()
@@ -221,9 +233,9 @@ class funcoesClientes(Funcoes):
         self.msg = self.entrada_mensagem.get()
         self.conecta_BD()
         clientes = self.cursor.execute("""
-        SELECT id, nome_cliente, email, primeira_comp, cpf, telefone FROM clientes
-        ORDER BY nome_cliente ASC;
-        """)
+            SELECT id, nome_cliente, email, nascimento, cpf, telefone, ultima_comp, pedidos, satisfacao FROM clientes
+            ORDER BY nome_cliente ASC;
+            """)
         acesso = autoMsg.AutoBot()
         acesso.acesso()
         acesso.iniciar(self.msg, clientes)
@@ -272,7 +284,7 @@ class Application(funcoesClientes, Up_Down):
         self.root.minsize(width=800, height=600)
 
     def frames_tela_cadastro(self):
-        #Cria os frames que irao aparecer na tela
+        # Cria os frames que irao aparecer na tela
         self.frame_1 = Frame(self.root, bd=4, bg=self.fundo,
                              highlightbackground=self.borda, highlightthickness=3)
         self.frame_1.place(rely=0.02, relx=0.02, relheight=0.46, relwidth=0.96)
@@ -282,7 +294,7 @@ class Application(funcoesClientes, Up_Down):
         self.frame_2.place(rely=0.5, relx=0.02, relheight=0.46, relwidth=0.96)
 
     def paginas(self):
-        #cria as abas da aplicaçao
+        # cria as abas da aplicaçao
         self.abas = ttk.Notebook(self.frame_1)
         self.aba_cadastro = Frame(self.abas)
         self.aba_envio = Frame(self.abas)
@@ -332,46 +344,69 @@ class Application(funcoesClientes, Up_Down):
         self.entrada_id = Entry(self.aba_cadastro)
         self.entrada_id.place(rely=0.1, relx=0.01,
                               relheight=0.1, relwidth=0.15)
-
         # Nome
         self.lb_nome = Label(self.aba_cadastro, text='Nome',
                              bg=self.fundo, font=(self.fonte_texto, self.tamanho))
         self.lb_nome.place(rely=0.225, relx=0.01)
         self.entrada_nome = Entry(self.aba_cadastro)
         self.entrada_nome.place(rely=0.3, relx=0.01,
-                                relheight=0.1, relwidth=0.93)
+                                relheight=0.1, relwidth=0.73)
+        
+        # E-mail
+        self.lb_email = Label(
+            self.aba_cadastro, text='E-mail', bg=self.fundo, font=(self.fonte_texto, self.tamanho))
+        self.lb_email.place(rely=0.425, relx=0.01)
+        self.entrada_email = Entry(self.aba_cadastro)
+        self.entrada_email.place(
+            rely=0.5, relx=0.01, relheight=0.1, relwidth=0.73)
+        
+        # Data Nascimento
+        self.lb_nasc = Label(self.aba_cadastro, text='Data de Nascimento',
+                              bg=self.fundo, font=(self.fonte_texto, self.tamanho))
+        self.lb_nasc.place(rely=0.625, relx=0.01)
+        self.entrada_nasc = Entry(self.aba_cadastro)
+        self.entrada_nasc.place(
+            rely=0.7, relx=0.01, relheight=0.1, relwidth=0.2)
+        
+        # CPF
+        self.lb_cpf = Label(self.aba_cadastro, text='CPF',
+                            bg=self.fundo, font=(self.fonte_texto, self.tamanho))
+        self.lb_cpf.place(rely=0.625, relx=0.25)
+        self.entrada_cpf = Entry(self.aba_cadastro)
+        self.entrada_cpf.place(
+            rely=0.7, relx=0.25, relheight=0.1, relwidth=0.2)
 
         # Whatsapp
         self.lb_wpp = Label(
             self.aba_cadastro, text='Contato WhatsApp', bg=self.fundo, font=(self.fonte_texto, self.tamanho))
-        self.lb_wpp.place(rely=0.425, relx=0.01)
+        self.lb_wpp.place(rely=0.625, relx=0.5)
         self.entrada_wpp = Entry(self.aba_cadastro)
-        self.entrada_wpp.place(rely=0.5, relx=0.01,
-                               relheight=0.1, relwidth=0.2)
-
-        # CPF
-        self.lb_cpf = Label(self.aba_cadastro, text='CPF',
-                            bg=self.fundo, font=(self.fonte_texto, self.tamanho))
-        self.lb_cpf.place(rely=0.425, relx=0.25)
-        self.entrada_cpf = Entry(self.aba_cadastro)
-        self.entrada_cpf.place(
-            rely=0.5, relx=0.25, relheight=0.1, relwidth=0.2)
-
-        # Data da 1 Compra
-        self.lb_data1 = Label(self.aba_cadastro, text='1º Compra',
+        self.entrada_wpp.place(
+            rely=0.7, relx=0.5, relheight=0.1, relwidth=0.2)
+        
+        # Data da Ultima Compra
+        self.lb_data = Label(self.aba_cadastro, text='Última Compra',
                               bg=self.fundo, font=(self.fonte_texto, self.tamanho))
-        self.lb_data1.place(rely=0.425, relx=0.5)
-        self.entrada_data1 = Entry(self.aba_cadastro)
-        self.entrada_data1.place(
-            rely=0.5, relx=0.5, relheight=0.1, relwidth=0.2)
-
-        # E-mail
-        self.lb_email = Label(
-            self.aba_cadastro, text='E-mail', bg=self.fundo, font=(self.fonte_texto, self.tamanho))
-        self.lb_email.place(rely=0.625, relx=0.01)
-        self.entrada_email = Entry(self.aba_cadastro)
-        self.entrada_email.place(
-            rely=0.7, relx=0.01, relheight=0.1, relwidth=0.73)
+        self.lb_data.place(rely=0.825, relx=0.01)
+        self.entrada_data = Entry(self.aba_cadastro)
+        self.entrada_data.place(
+            rely=0.875, relx=0.01, relheight=0.1, relwidth=0.2)
+        
+        #Pedidos
+        self.lb_pedidos = Label(self.aba_cadastro, text='Nº de Pedidos',
+                              bg=self.fundo, font=(self.fonte_texto, self.tamanho))
+        self.lb_pedidos.place(rely=0.825, relx=0.25)
+        self.entrada_pedidos = Entry(self.aba_cadastro)
+        self.entrada_pedidos.place(
+            rely=0.875, relx=0.25, relheight=0.1, relwidth=0.2)
+        
+        #Satisfaçao
+        self.lb_satis = Label(self.aba_cadastro, text='Satisfação',
+                              bg=self.fundo, font=(self.fonte_texto, self.tamanho))
+        self.lb_satis.place(rely=0.825, relx=0.5)
+        self.entrada_satis = Entry(self.aba_cadastro)
+        self.entrada_satis.place(
+            rely=0.875, relx=0.5, relheight=0.1, relwidth=0.2)
 
     def widgets_pag_2(self):
         # Cria os widgets da aba de envio de mensagens
@@ -397,16 +432,19 @@ class Application(funcoesClientes, Up_Down):
 
     def output_frame_2(self):
         # retorno do banco de dados
-        # nome_cliente, email, primeira_comp, cpf, telefone
+        # ID;Nome;E-mail;"Data de nascimento";CPF/CNPJ;Telefone;"Última compra";Pedidos;Satisfação
         self.saida = ttk.Treeview(self.frame_2, height=1, columns=(
-            'col1', 'col2', 'col3', 'col4', 'col5', 'col6'))
+            'col1', 'col2', 'col3', 'col4', 'col5', 'col6', 'col7', 'col8', 'col9'))
         self.saida.heading('#0', text='')
         self.saida.heading('#1', text='Id')
         self.saida.heading('#2', text='Nome')
         self.saida.heading('#3', text='E-mail')
-        self.saida.heading('#4', text='1º Compra')
+        self.saida.heading('#4', text='Data de Nasc.')
         self.saida.heading('#5', text='Cpf')
         self.saida.heading('#6', text='Whatsapp')
+        self.saida.heading('#7', text='Última Compra')
+        self.saida.heading('#8', text='Pedidos')
+        self.saida.heading('#9', text='Satisfação')
 
         self.saida.column('#0', width=0)
         self.saida.column('#1', width=5)
@@ -415,6 +453,10 @@ class Application(funcoesClientes, Up_Down):
         self.saida.column('#4', width=50)
         self.saida.column('#5', width=50)
         self.saida.column('#6', width=50)
+        self.saida.column('#7', width=50)
+        self.saida.column('#8', width=10)
+        self.saida.column('#9', width=10)
+        
 
         self.saida.place(rely=0.1, relx=0.01, relheight=0.85, relwidth=0.95)
 
