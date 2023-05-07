@@ -1,4 +1,4 @@
-﻿Nome;E-mail;"Data de nascimento";CPF/CNPJ;Telefone;"Última compra";Pedidos;Satisfação
+﻿Nome;E-mail;Data de nascimento;CPF/CNPJ;Telefone;Última compra;Pedidos;Satisfação
 Lucas Patrick Saturnino Nicácio;lucas.nicacio@ufv.br;03/05/2023;137.574.776-26;(31) 9 8818-5160;03/05/2023;1;10
 Maria Aparecida Nicacio;mariaanicacio@yahoo.com.br;04/05/2023;075.851.706-88;(31) 9 86979291;04/05/2023;10;10
 Amanda Cristina Nicacio Pimenta;amandaapimenta@yahoo.com.br;05/05/2023;137.574.776-27;(31) 9 8818-5161;05/05/2023;5;10
@@ -17,4 +17,19 @@ Jadyson;jadysonajadyson@yahoo.com.br;17/05/2023;137.574.776-33;(31) 9 8818-5167;
 Gabriel;gabrielagabriel@yahoo.com.br;18/05/2023;075.851.706-95;(31) 9 86979298;18/05/2023;60;10
 Silas Ravanni ;silasaravanni@yahoo.com.br;19/05/2023;137.574.776-34;(31) 9 8818-5168;19/05/2023;12;10
 Muriel;murielamuriel@yahoo.com.br;20/05/2023;075.851.706-96;(31) 9 86979299;20/05/2023;80;10
-Danilo ;daniloadanilo@yahoo.com.br;21/05/2023;137.574.776-35;(31) 9 8818-5169;21/05/2023;45;10
+Danilo ;daniloadanilo@yahoo.com.br;21/05/2023;137.574.776-35;(31) 9 8818-5169;21/05/2023;45;
+Giovanni Castro;giovannicastro@gmail.com;07/05/1987;023.456.789-09;(11) 88888-8888;20/04/2023;1;6
+Luan Santos;luansantos@hotmail.com;29/09/1991;111.222.333-44;(21) 77777-7777;23/04/2023;2;7
+Talita Lima;talitalima@yahoo.com.br;10/02/1984;222.333.444-55;(31) 99999-9999;21/04/2023;3;8
+Mariana Oliveira;marianaoliveira@uol.com.br;05/12/1995;333.444.555-66;(85) 11111-1111;22/04/2023;2;6
+Pedro Rodrigues;pedrorodrigues@hotmail.com;22/07/1989;444.555.666-77;(41) 66666-6666;28/04/2023;4;9
+Lucas Costa;lucascosta@gmail.com;16/05/1997;555.666.777-88;(61) 77777-7777;26/04/2023;1;5
+Julia Almeida;juliaalmeida@outlook.com;08/10/1993;666.777.888-99;(81) 55555-5555;24/04/2023;5;9
+Marcelo Ferreira;marceloferreira@terra.com.br;01/06/1986;777.888.999-00;(51) 44444-4444;30/04/2023;3;7
+Renata Oliveira;renataoliveira@yahoo.com.br;18/03/1990;888.999.000-11;(14) 33333-3333;27/04/2023;6;8
+Vinicius Santos;viniciussantos@gmail.com;24/11/1982;999.000.111-22;(91) 22222-2222;25/04/2023;4;7
+Sofia Castro;sofiacastro@hotmail.com;28/02/1998;000.111.222-33;(54) 99999-9999;01/05/2023;2;6
+Carolina Lima;carolinalima@gmail.com;15/09/1985;111.000.222-33;(37) 88888-8888;07/05/2023;5;9
+Lucas Oliveira;lucasoliveira@yahoo.com.br;19/12/1996;222.111.333-44;(11) 77777-7777;02/05/2023;1;5
+Luiza Rodrigues;luizarodrigues@uol.com.br;03/07/1992;333.222.444-55;(61) 99999-9999;30/04/2023;3;7
+Guilherme Costa;guilhermecosta@hotmail.com;11/05/1989;444.333.555-66;(85) 11111-1111;28/04/2023;;

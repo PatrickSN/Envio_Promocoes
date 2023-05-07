@@ -16,22 +16,28 @@ class Funcoes:
         self.entrada_id.delete(0, END)
         self.entrada_nome.delete(0, END)
         self.entrada_email.delete(0, END)
-        self.entrada_data1.delete(0, END)
+        self.entrada_nasc.delete(0, END)
         self.entrada_cpf.delete(0, END)
         self.entrada_wpp.delete(0, END)
-        self.entrada_mensagem.delete(0, END)
+        self.entrada_data.delete(0, END)
+        self.entrada_pedidos.delete(0, END)
+        self.entrada_satis.delete(0, END)
+
+    def write_to_output2(self, texto='Teste'):
+        # escreve uma mensagem no widget Text
+        self.output2.insert(END, f"{texto}\n")
 
     def conecta_BD(self):
         """Este método conecta-se ao banco de dados SQLite."""
         baseBD = "clientes.db"
-        print(f'Conectando ao Banco de Dados {baseBD}')
+        self.write_to_output2(f'Conectando ao Banco de Dados {baseBD}')
         self.conexao = sqlite3.connect(baseBD)
         self.cursor = self.conexao.cursor()
 
     def desconecta_BD(self):
         """Este método desconecta-se ao banco de dados SQLite."""
         self.conexao.close()
-        print('Banco de Dados desconectado')
+        self.write_to_output2('Banco de Dados desconectado')
 
     def montaTabelas(self):
         """Este método cria uma tabela chamada clientes no banco de dados, 
@@ -55,14 +61,14 @@ class Funcoes:
         self.conexao.commit()
         self.desconecta_BD()
 
-    def seleciona_saida(self, comandsql=None):
+    def seleciona_saida(self, nome_coluna='id'):
         """Este método executa uma consulta SQL para selecionar informações 
         de clientes do banco de dados e exibi-las na interface gráfica."""
         self.saida.delete(*self.saida.get_children())
         self.conecta_BD()
-        comandsql = """
+        comandsql = f"""
             SELECT id, nome_cliente, email, nascimento, cpf, telefone, ultima_comp, pedidos, satisfacao FROM clientes
-            ORDER BY id ASC;
+            ORDER BY {nome_coluna} ASC;
             """
         lista = self.cursor.execute(comandsql)
 
@@ -91,6 +97,30 @@ class Funcoes:
         self.limpa_tela()
         self.desconecta_BD()
 
+    def ordena(self, event=None):
+        coluna_id = event.widget.identify_column(event.x)
+        if coluna_id:
+            # ID;Nome;E-mail;"Data de nascimento";CPF/CNPJ;Telefone;"Última compra";Pedidos;Satisfação
+            if event.widget.heading(coluna_id, 'text') == 'Nome':
+                nome_coluna = 'nome_cliente'
+            elif event.widget.heading(coluna_id, 'text') == 'E-mail':
+                nome_coluna = 'email'
+            elif event.widget.heading(coluna_id, 'text') == 'Data de Nasc.':
+                nome_coluna = 'nascimento'
+            elif event.widget.heading(coluna_id, 'text') == 'CPF':
+                nome_coluna = 'cpf'
+            elif event.widget.heading(coluna_id, 'text') == 'Whatsapp':
+                nome_coluna = 'telefone'
+            elif event.widget.heading(coluna_id, 'text') == 'Última Compra':
+                nome_coluna = 'ultima_comp'
+            elif event.widget.heading(coluna_id, 'text') == 'Pedidos':
+                nome_coluna = 'pedidos'
+            elif event.widget.heading(coluna_id, 'text') == 'Satisfação':
+                nome_coluna = 'satisfacao'
+            else:
+                nome_coluna = 'id'
+        self.seleciona_saida(nome_coluna)
+
 
 class Up_Down(Funcoes):
     def open(self):
@@ -115,7 +145,7 @@ class Up_Down(Funcoes):
         """)
         for row in lista.fetchall():
             if nome == row[0]:
-                print(f"{nome} já existe no banco de dados!!!")
+                self.write_to_output2(f"{nome} já existe no banco de dados!!!")
                 return False
         else:
             return True
@@ -145,8 +175,7 @@ class Up_Down(Funcoes):
                             WHERE nome_cliente = ?
                         """, (cliente[1], cliente[2], cliente[3], cliente[4], cliente[5], cliente[6], cliente[7], cliente[0])
                         )
-                        print("contato atualizado")
-        self.conexao.commit()        
+        self.conexao.commit()
         self.desconecta_BD()
         self.seleciona_saida()
 
@@ -255,7 +284,8 @@ class Application(funcoesClientes, Up_Down):
         self.paginas()
         self.widgets_pag_1()
         self.widgets_pag_2()
-        self.output_frame_2()
+        self.output_frame2_banco()
+        self.output_frame2_retorno()
         self.montaTabelas()
         self.seleciona_saida()
         root.mainloop()
@@ -296,6 +326,9 @@ class Application(funcoesClientes, Up_Down):
     def paginas(self):
         # cria as abas da aplicaçao
         self.abas = ttk.Notebook(self.frame_1)
+        self.abas2 = ttk.Notebook(self.frame_2)
+
+        # abas do frame_1 e suas configuraçoes
         self.aba_cadastro = Frame(self.abas)
         self.aba_envio = Frame(self.abas)
 
@@ -305,7 +338,18 @@ class Application(funcoesClientes, Up_Down):
         self.abas.add(self.aba_cadastro, text='Cadastro')
         self.abas.add(self.aba_envio, text='Envio')
 
+        # abas do frame_2 e suas configuraçoes
+        self.aba_banco = Frame(self.abas2)
+        self.aba_retorno_back = Frame(self.abas2)
+
+        self.aba_banco.configure(background=self.fundo)
+        self.aba_retorno_back.configure(background=self.fundo)
+
+        self.abas2.add(self.aba_banco, text='Base de dados')
+        self.abas2.add(self.aba_retorno_back, text='Retorno')
+
         self.abas.place(rely=0, relx=0, relheight=0.98, relwidth=1)
+        self.abas2.place(rely=0, relx=0, relheight=0.98, relwidth=1)
 
     def botoes(self, aba):
         # botao limpar
@@ -351,7 +395,7 @@ class Application(funcoesClientes, Up_Down):
         self.entrada_nome = Entry(self.aba_cadastro)
         self.entrada_nome.place(rely=0.3, relx=0.01,
                                 relheight=0.1, relwidth=0.73)
-        
+
         # E-mail
         self.lb_email = Label(
             self.aba_cadastro, text='E-mail', bg=self.fundo, font=(self.fonte_texto, self.tamanho))
@@ -359,15 +403,15 @@ class Application(funcoesClientes, Up_Down):
         self.entrada_email = Entry(self.aba_cadastro)
         self.entrada_email.place(
             rely=0.5, relx=0.01, relheight=0.1, relwidth=0.73)
-        
+
         # Data Nascimento
         self.lb_nasc = Label(self.aba_cadastro, text='Data de Nascimento',
-                              bg=self.fundo, font=(self.fonte_texto, self.tamanho))
+                             bg=self.fundo, font=(self.fonte_texto, self.tamanho))
         self.lb_nasc.place(rely=0.625, relx=0.01)
         self.entrada_nasc = Entry(self.aba_cadastro)
         self.entrada_nasc.place(
             rely=0.7, relx=0.01, relheight=0.1, relwidth=0.2)
-        
+
         # CPF
         self.lb_cpf = Label(self.aba_cadastro, text='CPF',
                             bg=self.fundo, font=(self.fonte_texto, self.tamanho))
@@ -383,24 +427,24 @@ class Application(funcoesClientes, Up_Down):
         self.entrada_wpp = Entry(self.aba_cadastro)
         self.entrada_wpp.place(
             rely=0.7, relx=0.5, relheight=0.1, relwidth=0.2)
-        
+
         # Data da Ultima Compra
         self.lb_data = Label(self.aba_cadastro, text='Última Compra',
-                              bg=self.fundo, font=(self.fonte_texto, self.tamanho))
+                             bg=self.fundo, font=(self.fonte_texto, self.tamanho))
         self.lb_data.place(rely=0.825, relx=0.01)
         self.entrada_data = Entry(self.aba_cadastro)
         self.entrada_data.place(
             rely=0.875, relx=0.01, relheight=0.1, relwidth=0.2)
-        
-        #Pedidos
+
+        # Pedidos
         self.lb_pedidos = Label(self.aba_cadastro, text='Nº de Pedidos',
-                              bg=self.fundo, font=(self.fonte_texto, self.tamanho))
+                                bg=self.fundo, font=(self.fonte_texto, self.tamanho))
         self.lb_pedidos.place(rely=0.825, relx=0.25)
         self.entrada_pedidos = Entry(self.aba_cadastro)
         self.entrada_pedidos.place(
             rely=0.875, relx=0.25, relheight=0.1, relwidth=0.2)
-        
-        #Satisfaçao
+
+        # Satisfaçao
         self.lb_satis = Label(self.aba_cadastro, text='Satisfação',
                               bg=self.fundo, font=(self.fonte_texto, self.tamanho))
         self.lb_satis.place(rely=0.825, relx=0.5)
@@ -430,17 +474,17 @@ class Application(funcoesClientes, Up_Down):
         self.entrada_mensagem.place(
             rely=0.15, relx=0.01, relheight=0.7, relwidth=0.93)
 
-    def output_frame_2(self):
+    def output_frame2_banco(self):
         # retorno do banco de dados
         # ID;Nome;E-mail;"Data de nascimento";CPF/CNPJ;Telefone;"Última compra";Pedidos;Satisfação
-        self.saida = ttk.Treeview(self.frame_2, height=1, columns=(
+        self.saida = ttk.Treeview(self.aba_banco, height=1, columns=(
             'col1', 'col2', 'col3', 'col4', 'col5', 'col6', 'col7', 'col8', 'col9'))
         self.saida.heading('#0', text='')
         self.saida.heading('#1', text='Id')
         self.saida.heading('#2', text='Nome')
         self.saida.heading('#3', text='E-mail')
         self.saida.heading('#4', text='Data de Nasc.')
-        self.saida.heading('#5', text='Cpf')
+        self.saida.heading('#5', text='CPF')
         self.saida.heading('#6', text='Whatsapp')
         self.saida.heading('#7', text='Última Compra')
         self.saida.heading('#8', text='Pedidos')
@@ -456,7 +500,6 @@ class Application(funcoesClientes, Up_Down):
         self.saida.column('#7', width=50)
         self.saida.column('#8', width=10)
         self.saida.column('#9', width=10)
-        
 
         self.saida.place(rely=0.1, relx=0.01, relheight=0.85, relwidth=0.95)
 
@@ -468,6 +511,14 @@ class Application(funcoesClientes, Up_Down):
         self.saida.bind("<Delete>", self.abre_cliente)
         self.saida.bind("<Double-1>", self.abre_cliente)
         self.saida.bind("<Return>", self.abre_cliente)
+        self.saida.bind("<Button-1>", self.ordena)
+
+    def output_frame2_retorno(self):
+         # Cria a área de texto
+        self.output2 = Text(self.aba_retorno_back, bg=self.fundo, wrap=WORD, font=(self.fonte_texto, self.tamanho),
+                             yscrollcommand=self.scroolLista.set, spacing1=5)
+        self.output2.place(rely=0.1, relx=0.01, relheight=0.85, relwidth=0.95)
+        self.output2.configure(yscroll=self.scroolLista.set)
 
     def menus(self):
         barraMenu = Menu(self.root)
