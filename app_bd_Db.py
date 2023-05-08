@@ -12,6 +12,7 @@ import sqlite3
 
 import os
 import os.path
+import requests
 
 root = Tk()
 
@@ -129,19 +130,20 @@ class Funcoes:
 
 
 class Up_Down(Funcoes):
-    def open(self):
+    def abrir(self):
         """ Este método usa o módulo filedialog do Tkinter para abrir uma caixa de diálogo
           e permitir que o usuário selecione um arquivo.
 
         """
-        self.save_path = "C:/Users/lucas/Documents/App sp-MsG/"
-        root.filename = filedialog.askopenfilename(initialdir="C:/Users/lucas/Documents/App sp-MsG/",
-                                                   title="Selecione um arquivo", filetypes=(
-                                                       ('all files', '*.*'),
-                                                       ('db files', '*.db'),
-                                                       ('csv files', '*.csv')))
-        self.caminho = os.path.join(
-            self.save_path, os.path.basename(root.filename))
+        file_path = filedialog.askopenfilename(initialdir=os.getcwd(),
+                                            title="Selecione um arquivo", filetypes=(
+                                                ('all files', '*.*'),
+                                                ('db files', '*.db'),
+                                                ('csv files', '*.csv'),
+                                                ('jpg files', '*.jpg')))
+        if file_path:
+            self.caminho = file_path
+            self.imprime(f'Upload do arquivo: {self.caminho} ')
 
     def verifica(self, nome):
         """Este método verifica se um nome específico já existe no banco de dados."""
@@ -160,7 +162,7 @@ class Up_Down(Funcoes):
         """
         Este método carrega dados de clientes de um arquivo e os adiciona ao banco de dados.
         """
-        self.open()
+        self.abrir()
         self.conecta_BD()
         with open(self.caminho, encoding='utf-8') as lista_clientes:
             clientes = lista_clientes.readlines()
@@ -181,12 +183,14 @@ class Up_Down(Funcoes):
                             WHERE nome_cliente = ?
                         """, (cliente[1], cliente[2], cliente[3], cliente[4], cliente[5], cliente[6], cliente[7], cliente[0])
                         )
+
+        self.caminho = None
         self.conexao.commit()
         self.desconecta_BD()
         self.seleciona_saida()
 
 
-class AutoBot():
+class AutoBot(Up_Down):
     def __init__(self):
         # Configurações do google
         dir_path = os.getcwd()
@@ -200,9 +204,6 @@ class AutoBot():
         # Cria diretorio para salvar informaçoes de envio
         if not os.path.exists('Saves'):
             os.makedirs('Saves')
-        if not os.path.exists(f'Saves\Enviados_{datetime.now().strftime("%D-%M")}.csv'):
-            with open(f'Saves\Enviados_{datetime.now().strftime("%d-%m")}.csv', 'a') as enviados:
-                enviados.writelines('Erro; Nome do cliente; Envio\n')
 
     def acesso(self):
         """O método acesso() acessa a página do WhatsApp Web e aguarda até que a página 
@@ -227,7 +228,6 @@ class AutoBot():
     def comenta(self, mensagem):
         """O método comenta(mensagem) escreve uma mensagem para o contato selecionado e 
         envia a mensagem."""
-
         campo_comentario = self.driver.find_element(
             by=By.CSS_SELECTOR,
             value='div[title="Mensagem"]'
@@ -243,7 +243,21 @@ class AutoBot():
         time.sleep(1)
         campo_comentario.send_keys(Keys.ESCAPE)
 
-    def iniciar(self, textos, base_dados):
+    def envio_imagem(self,imagem):
+        # clicar no ícone de anexo
+        self.driver.find_element_by_xpath("//div[@title='Anexar']").click()
+
+        # selecionar a opção de enviar imagem
+        enviar_imagem = self.driver.find_element_by_xpath("//input[@accept='image/*,video/*']")
+        enviar_imagem.send_keys(imagem) # substitua pelo caminho da imagem que deseja enviar
+
+        # esperar 5 segundos para que a imagem seja carregada
+        time.sleep(5)
+
+        # clicar no botão de enviar
+        #self.driver.find_element_by_xpath("//span[@data-icon='send']").click()
+
+    def iniciar(self, textos, base_dados, image=None):
         """O método iniciar(textos,base_dados) inicia o envio de mensagens para a lista 
         de contatos fornecida."""
 
@@ -251,6 +265,8 @@ class AutoBot():
             time.sleep(5)
             self.pesquisa(pessoa[1])
             try:
+                if image != "":
+                    self.envio_imagem(image)
                 self.comenta(textos)
                 with open(f'Saves\Enviados_{datetime.now().strftime("%d-%m")}.csv', 'a') as enviados:
                     enviados.writelines(
@@ -273,7 +289,7 @@ class AutoBot():
         self.driver.close()
 
 
-class funcoesClientes(Funcoes):
+class funcoesClientes(Up_Down):
     def variaveis_clientes(self):
         """Atribui os valores inseridos nos campos de entrada a variáveis correspondentes."""
         self.id = self.entrada_id.get()
@@ -360,7 +376,12 @@ class funcoesClientes(Funcoes):
             """)
         acesso = AutoBot()
         acesso.acesso()
-        acesso.iniciar(self.msg, clientes)
+        if self.caminho != None:
+            self.imprime(f'Iniciando ... imagem {self.caminho} será carregada.')
+            acesso.iniciar(self.msg, clientes, self.caminho)
+        else:
+            self.imprime('Iniciando... ')
+            acesso.iniciar(self.msg, clientes)
         self.desconecta_BD()
 
 
@@ -547,6 +568,11 @@ class Application(funcoesClientes, Up_Down):
 
     def widgets_pag_2(self):
         # Cria os widgets da aba de envio de mensagens
+        # botao upload de imagem/video
+        self.bt_upload = Button(self.aba_envio, text='Enviar Imagem', bd=2, bg=self.fundo_botao,
+                                fg=self.texto_botao, font=(self.fonte_botao, self.tamanho, self.tipo), command=self.abrir)
+        self.bt_upload.place(rely=0.05, relx=0.7, relheight=0.1, relwidth=0.1)
+
         # botao limpar
         self.bt_limpar = Button(self.aba_envio, text='Limpar', bd=2, bg=self.fundo_botao,
                                 fg=self.texto_botao, font=(self.fonte_botao, self.tamanho, self.tipo), command=self.limpa_tela)
@@ -557,6 +583,8 @@ class Application(funcoesClientes, Up_Down):
                                 fg=self.texto_botao, font=(self.fonte_botao, self.tamanho, self.tipo), command=self.envia_msg)
         self.bt_enviar.place(rely=0.9, relx=0.7, relheight=0.1, relwidth=0.1)
 
+        # botao filtar
+        
         # botao parar
 
         # entrada da mensagem a ser enviada

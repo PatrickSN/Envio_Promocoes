@@ -1,3 +1,22 @@
-2023/05/07-22:58:45.819 7340 Reusing MANIFEST C:\Users\lucas\Documents\App sp-MsG\profile\bot\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
-2023/05/07-22:58:45.820 7340 Recovering log #765
-2023/05/07-22:58:45.833 7340 Reusing old log C:\Users\lucas\Documents\App sp-MsG\profile\bot\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000765.log 
+2023/05/08-00:35:06.745 9098 Reusing MANIFEST C:\Users\lucas\Documents\App sp-MsG\profile\bot\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2023/05/08-00:35:06.745 9098 Recovering log #912
+2023/05/08-00:35:06.755 9098 Reusing old log C:\Users\lucas\Documents\App sp-MsG\profile\bot\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000912.log 
+2023/05/08-00:35:07.772 9098 Compacting 1@1 + 1@2 files
+2023/05/08-00:35:07.816 9098 Generated table #918@1: 27337 keys, 2199024 bytes
+2023/05/08-00:35:07.833 9098 Generated table #919@1: 1799 keys, 1190026 bytes
+2023/05/08-00:35:07.833 9098 Compacted 1@1 + 1@2 files => 3389050 bytes
+2023/05/08-00:35:07.834 9098 compacted to: files[ 0 2 2 0 0 0 0 ]
+2023/05/08-00:35:07.834 9098 Delete type=2 #911
+2023/05/08-00:35:07.834 9098 Delete type=2 #914
+2023/05/08-00:35:20.596 6c88 Level-0 table #921: started
+2023/05/08-00:35:20.612 6c88 Level-0 table #921: 1053945 bytes OK
+2023/05/08-00:35:20.613 6c88 Delete type=0 #912
+2023/05/08-00:35:21.634 6c88 Compacting 1@0 + 2@1 files
+2023/05/08-00:35:21.672 6c88 Generated table #922@0: 25102 keys, 2197963 bytes
+2023/05/08-00:35:21.720 6c88 Generated table #923@0: 45638 keys, 2250336 bytes
+2023/05/08-00:35:21.724 6c88 Generated table #924@0: 6645 keys, 146160 bytes
+2023/05/08-00:35:21.724 6c88 Compacted 1@0 + 2@1 files => 4594459 bytes
+2023/05/08-00:35:21.725 6c88 compacted to: files[ 0 3 2 0 0 0 0 ]
+2023/05/08-00:35:21.725 6c88 Delete type=2 #915
+2023/05/08-00:35:21.725 6c88 Delete type=2 #916
+2023/05/08-00:35:21.725 6c88 Delete type=2 #921
