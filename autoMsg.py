@@ -59,35 +59,38 @@ class AutoBot:
         print('Acesso...')
 
     def pesquisa(self, nome):
-        # Localiza o campo de pesquisa e
-        # Escreve o texto desejado no campo de pesquisa
-        print(f'Pesquisando... {nome}')
-        campo_pesquisa = self.driver.find_element(
+        """O método pesquisa(nome) pesquisa um contato no campo de pesquisa do WhatsApp 
+        Web e seleciona o contato correspondente."""
+        self.campo_pesquisa = self.driver.find_element(
             by=By.CSS_SELECTOR,
             value='div[title="Caixa de texto de pesquisa"]'
         )
-        campo_pesquisa.click()
-        campo_pesquisa.clear()
-        campo_pesquisa.send_keys(nome)
+        self.campo_pesquisa.click()
+        self.campo_pesquisa.clear()
+        self.campo_pesquisa.send_keys(nome)
         time.sleep(1)
-        campo_pesquisa.send_keys(Keys.RETURN)
+        self.campo_pesquisa.send_keys(Keys.RETURN)
 
     def comenta(self, mensagem):
-        # Localiza o campo de comentarios e escreve uma resposta
-        campo_comentario = self.driver.find_element(
-            by=By.CSS_SELECTOR,
-            value='div[title="Mensagem"]'
-        )
-        campo_comentario.click()
-        campo_comentario.clear
-        campo_comentario.send_keys(mensagem)
-        time.sleep(2)
-        self.driver.find_element(
-            by=By.CSS_SELECTOR,
-            value='button[aria-label="Enviar"]'
-        ).click()
-        time.sleep(1)
-        campo_comentario.send_keys(Keys.ESCAPE)
+        """O método comenta(mensagem) escreve uma mensagem para o contato selecionado e 
+        envia a mensagem."""
+        try:
+            campo_comentario = self.driver.find_element(
+                by=By.CSS_SELECTOR,
+                value='div[title="Mensagem"]'
+            )
+            campo_comentario.click()
+            campo_comentario.clear()
+            campo_comentario.send_keys(mensagem)
+            time.sleep(2)
+            self.driver.find_element(
+                by=By.CSS_SELECTOR,
+                value='button[aria-label="Enviar"]'
+            ).click()
+            time.sleep(1)
+            campo_comentario.send_keys(Keys.ESCAPE)
+        except:
+            self.campo_pesquisa.send_keys(Keys.ESCAPE)
 
     def iniciar(self, textos, base_dados):
         print('Iniciando...', datetime.now().strftime('%H %M %S'))
@@ -97,7 +100,7 @@ class AutoBot:
             self.pesquisa(pessoa[1])
             self.comenta(textos)
             print(pessoa[1], "-", datetime.now().strftime('%H %M %S'))
-            time.sleep(20)
+            time.sleep(10)
 
         self.finaliza()
     
@@ -108,7 +111,7 @@ class AutoBot:
 
 if __name__ == "__main__":
     msg = "teste"
-    pessoa = ["Lucas Patrick", "Entregas por fora"]
+    pessoas = ["Lucas Patrick", "Entregas por fora"]
     OnlineBot = AutoBot()
     OnlineBot.acesso()
-    OnlineBot.iniciar(msg, pessoa)
+    OnlineBot.iniciar(msg, pessoas)

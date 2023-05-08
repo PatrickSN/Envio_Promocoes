@@ -1,9 +1,15 @@
+from datetime import datetime
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+import time
+
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
 import sqlite3
 
-import autoMsg
 import os
 import os.path
 
@@ -23,21 +29,21 @@ class Funcoes:
         self.entrada_pedidos.delete(0, END)
         self.entrada_satis.delete(0, END)
 
-    def write_to_output2(self, texto='Teste'):
+    def imprime(self, texto='Teste'):
         # escreve uma mensagem no widget Text
         self.output2.insert(END, f"{texto}\n")
 
     def conecta_BD(self):
         """Este método conecta-se ao banco de dados SQLite."""
         baseBD = "clientes.db"
-        self.write_to_output2(f'Conectando ao Banco de Dados {baseBD}')
+        self.imprime(f'Conectando ao Banco de Dados {baseBD}')
         self.conexao = sqlite3.connect(baseBD)
         self.cursor = self.conexao.cursor()
 
     def desconecta_BD(self):
         """Este método desconecta-se ao banco de dados SQLite."""
         self.conexao.close()
-        self.write_to_output2('Banco de Dados desconectado')
+        self.imprime('Banco de Dados desconectado')
 
     def montaTabelas(self):
         """Este método cria uma tabela chamada clientes no banco de dados, 
@@ -145,7 +151,7 @@ class Up_Down(Funcoes):
         """)
         for row in lista.fetchall():
             if nome == row[0]:
-                self.write_to_output2(f"{nome} já existe no banco de dados!!!")
+                self.imprime(f"{nome} já existe no banco de dados!!!")
                 return False
         else:
             return True
@@ -180,15 +186,102 @@ class Up_Down(Funcoes):
         self.seleciona_saida()
 
 
+class AutoBot():
+    def __init__(self):
+        # Configurações do google
+        dir_path = os.getcwd()
+        profile = os.path.join(dir_path, "profile", "bot")
+        options = ChromeOptions()
+        # options.add_argument("--headless")
+        options.add_argument("--mute-audio")
+        options.add_argument(
+            r"user-data-dir={}".format(profile))
+        self.driver = webdriver.Chrome(options=options)
+        # Cria diretorio para salvar informaçoes de envio
+        if not os.path.exists('Saves'):
+            os.makedirs('Saves')
+        if not os.path.exists(f'Saves\Enviados_{datetime.now().strftime("%D-%M")}.csv'):
+            with open(f'Saves\Enviados_{datetime.now().strftime("%d-%m")}.csv', 'a') as enviados:
+                enviados.writelines('Erro; Nome do cliente; Envio\n')
+
+    def acesso(self):
+        """O método acesso() acessa a página do WhatsApp Web e aguarda até que a página 
+        esteja carregada."""
+        driver = self.driver
+        driver.get("https://web.whatsapp.com/")
+        driver.implicitly_wait(30)
+
+    def pesquisa(self, nome):
+        """O método pesquisa(nome) pesquisa um contato no campo de pesquisa do WhatsApp 
+        Web e seleciona o contato correspondente."""
+        self.campo_pesquisa = self.driver.find_element(
+            by=By.CSS_SELECTOR,
+            value='div[title="Caixa de texto de pesquisa"]'
+        )
+        self.campo_pesquisa.click()
+        self.campo_pesquisa.clear()
+        self.campo_pesquisa.send_keys(nome)
+        time.sleep(1)
+        self.campo_pesquisa.send_keys(Keys.RETURN)
+
+    def comenta(self, mensagem):
+        """O método comenta(mensagem) escreve uma mensagem para o contato selecionado e 
+        envia a mensagem."""
+
+        campo_comentario = self.driver.find_element(
+            by=By.CSS_SELECTOR,
+            value='div[title="Mensagem"]'
+        )
+        campo_comentario.click()
+        campo_comentario.clear()
+        campo_comentario.send_keys(mensagem)
+        time.sleep(2)
+        self.driver.find_element(
+            by=By.CSS_SELECTOR,
+            value='button[aria-label="Enviar"]'
+        ).click()
+        time.sleep(1)
+        campo_comentario.send_keys(Keys.ESCAPE)
+
+    def iniciar(self, textos, base_dados):
+        """O método iniciar(textos,base_dados) inicia o envio de mensagens para a lista 
+        de contatos fornecida."""
+
+        for pessoa in base_dados:
+            time.sleep(5)
+            self.pesquisa(pessoa[1])
+            try:
+                self.comenta(textos)
+                with open(f'Saves\Enviados_{datetime.now().strftime("%d-%m")}.csv', 'a') as enviados:
+                    enviados.writelines(
+                        f'; {pessoa[1]}; {datetime.now().strftime("%H %M %S")}\n')
+
+            except Exception as e:
+                self.campo_pesquisa.send_keys(Keys.ESCAPE)
+                with open(f'Saves\Enviados_{datetime.now().strftime("%d-%m")}.csv', 'a') as enviados:
+                    enviados.writelines(
+                        f'Erro - {e}; {pessoa[1]}; {datetime.now().strftime("%H %M %S")}\n')
+
+            time.sleep(10)
+
+        self.finaliza()
+
+    def finaliza(self):
+        with open(f'Saves\Enviados_{datetime.now().strftime("%d-%m")}.csv', 'a') as enviados:
+            enviados.writelines(
+                f'Finalizado às {datetime.now().strftime("%H %M %S")}')
+        self.driver.close()
+
+
 class funcoesClientes(Funcoes):
     def variaveis_clientes(self):
         """Atribui os valores inseridos nos campos de entrada a variáveis correspondentes."""
         self.id = self.entrada_id.get()
         self.nome = self.entrada_nome.get()
         self.email = self.entrada_email.get()
-        self.pri_comp = self.entrada_nasc.get()
+        self.nasc = self.entrada_nasc.get()
         self.cpf = self.entrada_cpf.get()
-        self.telefone = self.entrada_wpp.get()
+        self.wpp = self.entrada_wpp.get()
         self.data = self.entrada_data.get()
         self.pedidos = self.entrada_pedidos.get()
         self.satis = self.entrada_satis.get()
@@ -265,7 +358,7 @@ class funcoesClientes(Funcoes):
             SELECT id, nome_cliente, email, nascimento, cpf, telefone, ultima_comp, pedidos, satisfacao FROM clientes
             ORDER BY nome_cliente ASC;
             """)
-        acesso = autoMsg.AutoBot()
+        acesso = AutoBot()
         acesso.acesso()
         acesso.iniciar(self.msg, clientes)
         self.desconecta_BD()
@@ -514,9 +607,9 @@ class Application(funcoesClientes, Up_Down):
         self.saida.bind("<Button-1>", self.ordena)
 
     def output_frame2_retorno(self):
-         # Cria a área de texto
+        # Cria a área de texto
         self.output2 = Text(self.aba_retorno_back, bg=self.fundo, wrap=WORD, font=(self.fonte_texto, self.tamanho),
-                             yscrollcommand=self.scroolLista.set, spacing1=5)
+                            yscrollcommand=self.scroolLista.set, spacing1=5)
         self.output2.place(rely=0.1, relx=0.01, relheight=0.85, relwidth=0.95)
         self.output2.configure(yscroll=self.scroolLista.set)
 
