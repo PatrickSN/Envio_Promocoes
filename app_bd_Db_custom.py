@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional, Tuple, Union
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -36,12 +35,11 @@ class Funcoes:
     def imprime(self, texto='Teste'):
         # escreve uma mensagem no widget Text
         self.output2.insert('0.0', f"{texto}\n\n")
-        self.output2.insert('0.0',f'{datetime.now()}\n')
 
     def conecta_BD(self):
         """Este método conecta-se ao banco de dados SQLite."""
         baseBD = "clientes.db"
-        self.imprime(f'Conectando ao Banco de Dados {baseBD}')
+        self.imprime(f'{datetime.now()}\nConectando ao Banco de Dados {baseBD}')
         self.conexao = sqlite3.connect(baseBD)
         self.cursor = self.conexao.cursor()
 
@@ -134,6 +132,12 @@ class Funcoes:
             
             self.seleciona_saida(nome_coluna)
 
+    def abre_lista(self):
+        path = 'Saves/Enviados_'+str(f'{datetime.now().strftime("%d-%m")}')+'.csv'
+        with open(path, 'r') as lista:
+            for linha in lista:
+                self.imprime(linha)
+
 
 class Up_Down(Funcoes):
     def abrir(self):
@@ -149,7 +153,7 @@ class Up_Down(Funcoes):
             ('jpg files', '*.jpg')))
         if file_path:
             self.caminho = file_path
-            self.imprime(f'Upload do arquivo: {self.caminho} ')
+            self.imprime(f'{datetime.now()}\nUpload do arquivo: {self.caminho} ')
 
     def verifica(self, nome):
         """Este método verifica se um nome específico já existe no banco de dados."""
@@ -279,6 +283,7 @@ class AutoBot(Up_Down):
                 with open(f'Saves\Enviados_{datetime.now().strftime("%d-%m")}.csv', 'a') as enviados:
                     enviados.writelines(
                         f'; {pessoa[1]}; {datetime.now().strftime("%H %M %S")}\n')
+                time.sleep(2)
 
             except Exception as e:
                 self.campo_pesquisa.send_keys(Keys.ESCAPE)
@@ -286,14 +291,14 @@ class AutoBot(Up_Down):
                     enviados.writelines(
                         f'Erro - {e}; {pessoa[1]}; {datetime.now().strftime("%H %M %S")}\n')
 
-            time.sleep(10)
+            time.sleep(5)
 
         self.finaliza()
 
     def finaliza(self):
         with open(f'Saves\Enviados_{datetime.now().strftime("%d-%m")}.csv', 'a') as enviados:
             enviados.writelines(
-                f'Finalizado às {datetime.now().strftime("%H %M %S")}')
+                f'Finalizado às {datetime.now().strftime("%H %M %S")}\n\n')
         self.driver.close()
 
 
@@ -373,7 +378,7 @@ class funcoesClientes(Up_Down):
         self.desconecta_BD()
         self.seleciona_saida()
         self.limpa_tela()
-
+    
     def envia_msg(self):
         """Envia uma mensagem para todos os clientes na tabela "clientes" do banco de dados, usando a classe "autoMsg"."""
         self.msg = self.entrada_mensagem.get()
@@ -386,15 +391,16 @@ class funcoesClientes(Up_Down):
         acesso.acesso()
         if self.caminho != None:
             self.imprime(
-                f'Iniciando ... imagem {self.caminho} será carregada.')
+                f'{datetime.now()}\nIniciando ... imagem {self.caminho} será carregada.')
             acesso.iniciar(self.msg, clientes, self.caminho)
         else:
-            self.imprime('Iniciando... ')
+            self.imprime(f'{datetime.now()}\nIniciando...')
             acesso.iniciar(self.msg, clientes)
+        self.abre_lista()
         self.desconecta_BD()
 
 
-class Application(CTk, funcoesClientes, Up_Down):
+class Application(CTk, funcoesClientes):
     def __init__(self):
         super().__init__()
         self.tela()
@@ -408,6 +414,7 @@ class Application(CTk, funcoesClientes, Up_Down):
         self.frame_2_retorno()
         self.montaTabelas()
         self.seleciona_saida()
+        self.caminho = None
 
     def tela(self):
         self.title('Envio de Promocoes')

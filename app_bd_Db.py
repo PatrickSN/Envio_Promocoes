@@ -31,12 +31,12 @@ class Funcoes:
 
     def imprime(self, texto='Teste'):
         # escreve uma mensagem no widget Text
-        self.output2.insert(END, f"{texto}\n")
+        self.output2.insert('0.0', f"{texto}\n\n")
 
     def conecta_BD(self):
         """Este método conecta-se ao banco de dados SQLite."""
         baseBD = "clientes.db"
-        self.imprime(f'Conectando ao Banco de Dados {baseBD}')
+        self.imprime(f'{datetime.now()}\nConectando ao Banco de Dados {baseBD}')
         self.conexao = sqlite3.connect(baseBD)
         self.cursor = self.conexao.cursor()
 
@@ -128,6 +128,12 @@ class Funcoes:
                 nome_coluna = 'id'
             
             self.seleciona_saida(nome_coluna)
+
+    def abre_lista(self):
+        path = 'Saves/Enviados_'+str(f'{datetime.now().strftime("%d-%m")}')+'.csv'
+        with open(path, 'r') as lista:
+            for linha in lista:
+                self.imprime(linha)
 
 
 class Up_Down(Funcoes):
@@ -286,7 +292,7 @@ class AutoBot(Up_Down):
     def finaliza(self):
         with open(f'Saves\Enviados_{datetime.now().strftime("%d-%m")}.csv', 'a') as enviados:
             enviados.writelines(
-                f'Finalizado às {datetime.now().strftime("%H %M %S")}')
+                f'Finalizado às {datetime.now().strftime("%H %M %S")}\n\n')
         self.driver.close()
 
 
@@ -378,15 +384,16 @@ class funcoesClientes(Up_Down):
         acesso = AutoBot()
         acesso.acesso()
         if self.caminho != None:
-            self.imprime(f'Iniciando ... imagem {self.caminho} será carregada.')
+            self.imprime(
+                f'{datetime.now()}\nIniciando ... imagem {self.caminho} será carregada.')
             acesso.iniciar(self.msg, clientes, self.caminho)
         else:
-            self.imprime('Iniciando... ')
+            self.imprime(f'{datetime.now()}\nIniciando... ')
             acesso.iniciar(self.msg, clientes)
         self.desconecta_BD()
 
 
-class Application(funcoesClientes, Up_Down):
+class Application(funcoesClientes):
     def __init__(self):
         """Construtor da classe que inicializa a aplicação, definindo os métodos
         de personalização da tela, criação de widgets e seleção de saída. 
@@ -403,6 +410,7 @@ class Application(funcoesClientes, Up_Down):
         self.output_frame2_retorno()
         self.montaTabelas()
         self.seleciona_saida()
+        self.caminho = None
         root.mainloop()
 
     def personalisacao(self, fundo_tela='#353578', fundo='#cecef5',
