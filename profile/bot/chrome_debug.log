@@ -1,7 +1,7 @@
-[30500:32060:0510/012436.442:WARNING:chrome_main_delegate.cc(589)] This is Chrome version 113.0.5672.93 (not a warning)
-[30500:32060:0510/012436.572:INFO:chrome_browser_cloud_management_controller.cc(167)] Starting CBCM Controller Initialization
-[30500:32060:0510/012436.572:INFO:chrome_browser_cloud_management_controller.cc(195)] No machine level policy manager exists.
-[30500:32060:0510/012437.714:INFO:CONSOLE(1)] "Uncaught (in promise) TypeError: Failed to execute 'put' on 'Cache': Partial response (status code 206) is unsupported", source: https://web.whatsapp.com/serviceworker.js (1)
-[30500:32060:0510/012438.131:INFO:CONSOLE(1)] "Uncaught (in promise) TypeError: Failed to execute 'put' on 'Cache': Partial response (status code 206) is unsupported", source: https://web.whatsapp.com/serviceworker.js (1)
-[30500:32060:0510/012438.132:INFO:CONSOLE(1)] "Uncaught (in promise) TypeError: Failed to execute 'put' on 'Cache': Partial response (status code 206) is unsupported", source: https://web.whatsapp.com/serviceworker.js (1)
-[30500:32060:0510/012524.022:WARNING:pref_notifier_impl.cc(41)] Pref observer for media_router.cast_allow_all_ips found at shutdown.
+[23624:6688:0510/023418.642:WARNING:chrome_main_delegate.cc(589)] This is Chrome version 113.0.5672.93 (not a warning)
+[23624:6688:0510/023418.766:INFO:chrome_browser_cloud_management_controller.cc(167)] Starting CBCM Controller Initialization
+[23624:6688:0510/023418.766:INFO:chrome_browser_cloud_management_controller.cc(195)] No machine level policy manager exists.
+[23624:6688:0510/023419.809:INFO:CONSOLE(1)] "Uncaught (in promise) TypeError: Failed to execute 'put' on 'Cache': Partial response (status code 206) is unsupported", source: https://web.whatsapp.com/serviceworker.js (1)
+[23624:6688:0510/023420.207:INFO:CONSOLE(1)] "Uncaught (in promise) TypeError: Failed to execute 'put' on 'Cache': Partial response (status code 206) is unsupported", source: https://web.whatsapp.com/serviceworker.js (1)
+[23624:6688:0510/023420.207:INFO:CONSOLE(1)] "Uncaught (in promise) TypeError: Failed to execute 'put' on 'Cache': Partial response (status code 206) is unsupported", source: https://web.whatsapp.com/serviceworker.js (1)
+[23624:6688:0510/023511.705:WARNING:pref_notifier_impl.cc(41)] Pref observer for media_router.cast_allow_all_ips found at shutdown.

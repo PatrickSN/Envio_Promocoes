@@ -1,3 +1,5 @@
-2023/05/10-01:16:34.088 2b14 Reusing MANIFEST C:\Users\lucas\Documents\App sp-MsG\profile\bot\Default\Local Storage\leveldb/MANIFEST-000001
-2023/05/10-01:16:34.089 2b14 Recovering log #11
-2023/05/10-01:16:34.092 2b14 Reusing old log C:\Users\lucas\Documents\App sp-MsG\profile\bot\Default\Local Storage\leveldb/000011.log 
+2023/05/10-02:31:56.061 143c Reusing MANIFEST C:\Users\lucas\Documents\App sp-MsG\profile\bot\Default\Local Storage\leveldb/MANIFEST-000001
+2023/05/10-02:31:56.062 143c Recovering log #11
+2023/05/10-02:31:56.064 143c Reusing old log C:\Users\lucas\Documents\App sp-MsG\profile\bot\Default\Local Storage\leveldb/000011.log 
+2023/05/10-02:32:42.497 6bf8 Level-0 table #14: started
+2023/05/10-02:32:42.501 6bf8 Level-0 table #14: 12275 bytes OK

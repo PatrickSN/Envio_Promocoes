@@ -13,6 +13,7 @@ import sqlite3
 
 import os
 import os.path
+import requests
 
 
 set_appearance_mode("Systen")
@@ -201,7 +202,7 @@ class Up_Down(Funcoes):
 
 
 class AutoBot(Up_Down):
-    def __init__(self):
+    def __init__(self,espera=1):
         # Configurações do google
         dir_path = os.getcwd()
         profile = os.path.join(dir_path, "profile", "bot")
@@ -214,13 +215,14 @@ class AutoBot(Up_Down):
         # Cria diretorio para salvar informaçoes de envio
         if not os.path.exists('Saves'):
             os.makedirs('Saves')
+        self.espera=espera
 
     def acesso(self):
         """O método acesso() acessa a página do WhatsApp Web e aguarda até que a página 
         esteja carregada."""
         driver = self.driver
         driver.get("https://web.whatsapp.com/")
-        driver.implicitly_wait(30)
+        driver.implicitly_wait(30*self.espera)
 
     def pesquisa(self, nome):
         """O método pesquisa(nome) pesquisa um contato no campo de pesquisa do WhatsApp 
@@ -232,7 +234,7 @@ class AutoBot(Up_Down):
         self.campo_pesquisa.click()
         self.campo_pesquisa.clear()
         self.campo_pesquisa.send_keys(nome)
-        time.sleep(1)
+        time.sleep(1*self.espera)
         self.campo_pesquisa.send_keys(Keys.RETURN)
 
     def comenta(self, mensagem):
@@ -245,26 +247,31 @@ class AutoBot(Up_Down):
         campo_comentario.click()
         campo_comentario.clear()
         campo_comentario.send_keys(mensagem)
-        time.sleep(2)
+        time.sleep(2*self.espera)
         self.driver.find_element(
             by=By.CSS_SELECTOR,
             value='button[aria-label="Enviar"]'
         ).click()
-        time.sleep(1)
+        time.sleep(1*self.espera)
         campo_comentario.send_keys(Keys.ESCAPE)
 
     def envio_imagem(self, imagem):
         # clicar no ícone de anexo
-        self.driver.find_element_by_xpath("//div[@title='Anexar']").click()
+        anexo = self.driver.find_element(
+            by=By.XPATH,
+            value='//div[@title="Anexar"]')
+        anexo.click()
 
         # selecionar a opção de enviar imagem
-        enviar_imagem = self.driver.find_element_by_xpath(
-            "//input[@accept='image/*,video/*']")
+        enviar_imagem = self.driver.find_element(
+            by=By.CLASS_NAME,
+            value='_1CGek')
+        enviar_imagem.click()
         # substitua pelo caminho da imagem que deseja enviar
         enviar_imagem.send_keys(imagem)
 
         # esperar 5 segundos para que a imagem seja carregada
-        time.sleep(5)
+        time.sleep(5*self.espera)
 
         # clicar no botão de enviar
         # self.driver.find_element_by_xpath("//span[@data-icon='send']").click()
@@ -274,16 +281,21 @@ class AutoBot(Up_Down):
         de contatos fornecida."""
 
         for pessoa in base_dados:
-            time.sleep(5)
+            time.sleep(5*self.espera)
             self.pesquisa(pessoa[1])
+            time.sleep(2*self.espera)
             try:
                 if image != "":
                     self.envio_imagem(image)
+                    time.sleep(1)
+            except Exception as e:
+                print(e)
+            try:
                 self.comenta(textos)
                 with open(f'Saves\Enviados_{datetime.now().strftime("%d-%m")}.csv', 'a') as enviados:
                     enviados.writelines(
                         f'; {pessoa[1]}; {datetime.now().strftime("%H %M %S")}\n')
-                time.sleep(2)
+                time.sleep(2*self.espera)
 
             except Exception as e:
                 self.campo_pesquisa.send_keys(Keys.ESCAPE)
@@ -291,7 +303,7 @@ class AutoBot(Up_Down):
                     enviados.writelines(
                         f'Erro - {e}; {pessoa[1]}; {datetime.now().strftime("%H %M %S")}\n')
 
-            time.sleep(5)
+            time.sleep(5*self.espera)
 
         self.finaliza()
 
@@ -397,6 +409,7 @@ class funcoesClientes(Up_Down):
             self.imprime(f'{datetime.now()}\nIniciando...')
             acesso.iniciar(self.msg, clientes)
         self.abre_lista()
+        self.limpa_tela()
         self.desconecta_BD()
 
 
