@@ -1,19 +1,23 @@
 from datetime import datetime
+from typing import Optional, Tuple, Union
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 import time
 
-from tkinter import *
+from customtkinter import *
 from tkinter import ttk
+from tkinter import *
 from tkinter import filedialog
 import sqlite3
 
 import os
 import os.path
 
-root = Tk()
+
+set_appearance_mode("Systen")
+set_default_color_theme("blue")
 
 
 class Funcoes:
@@ -31,7 +35,8 @@ class Funcoes:
 
     def imprime(self, texto='Teste'):
         # escreve uma mensagem no widget Text
-        self.output2.insert(END, f"{texto}\n")
+        self.output2.insert('0.0', f"{texto}\n\n")
+        self.output2.insert('0.0',f'{datetime.now()}\n')
 
     def conecta_BD(self):
         """Este método conecta-se ao banco de dados SQLite."""
@@ -137,11 +142,11 @@ class Up_Down(Funcoes):
 
         """
         file_path = filedialog.askopenfilename(initialdir=os.getcwd(),
-                                            title="Selecione um arquivo", filetypes=(
-                                                ('all files', '*.*'),
-                                                ('db files', '*.db'),
-                                                ('csv files', '*.csv'),
-                                                ('jpg files', '*.jpg')))
+                                               title="Selecione um arquivo", filetypes=(
+            ('all files', '*.*'),
+            ('db files', '*.db'),
+            ('csv files', '*.csv'),
+            ('jpg files', '*.jpg')))
         if file_path:
             self.caminho = file_path
             self.imprime(f'Upload do arquivo: {self.caminho} ')
@@ -244,19 +249,21 @@ class AutoBot(Up_Down):
         time.sleep(1)
         campo_comentario.send_keys(Keys.ESCAPE)
 
-    def envio_imagem(self,imagem):
+    def envio_imagem(self, imagem):
         # clicar no ícone de anexo
         self.driver.find_element_by_xpath("//div[@title='Anexar']").click()
 
         # selecionar a opção de enviar imagem
-        enviar_imagem = self.driver.find_element_by_xpath("//input[@accept='image/*,video/*']")
-        enviar_imagem.send_keys(imagem) # substitua pelo caminho da imagem que deseja enviar
+        enviar_imagem = self.driver.find_element_by_xpath(
+            "//input[@accept='image/*,video/*']")
+        # substitua pelo caminho da imagem que deseja enviar
+        enviar_imagem.send_keys(imagem)
 
         # esperar 5 segundos para que a imagem seja carregada
         time.sleep(5)
 
         # clicar no botão de enviar
-        #self.driver.find_element_by_xpath("//span[@data-icon='send']").click()
+        # self.driver.find_element_by_xpath("//span[@data-icon='send']").click()
 
     def iniciar(self, textos, base_dados, image=None):
         """O método iniciar(textos,base_dados) inicia o envio de mensagens para a lista 
@@ -378,7 +385,8 @@ class funcoesClientes(Up_Down):
         acesso = AutoBot()
         acesso.acesso()
         if self.caminho != None:
-            self.imprime(f'Iniciando ... imagem {self.caminho} será carregada.')
+            self.imprime(
+                f'Iniciando ... imagem {self.caminho} será carregada.')
             acesso.iniciar(self.msg, clientes, self.caminho)
         else:
             self.imprime('Iniciando... ')
@@ -386,217 +394,210 @@ class funcoesClientes(Up_Down):
         self.desconecta_BD()
 
 
-class Application(funcoesClientes, Up_Down):
+class Application(CTk, funcoesClientes, Up_Down):
     def __init__(self):
-        """Construtor da classe que inicializa a aplicação, definindo os métodos
-        de personalização da tela, criação de widgets e seleção de saída. 
-        Por fim, inicia o loop principal da aplicação."""
-        self.root = root
-        self.personalisacao()
+        super().__init__()
         self.tela()
+        self.personalizacao()
         self.menus()
-        self.frames_tela_cadastro()
+        self.frames_tela()
         self.paginas()
-        self.widgets_pag_1()
-        self.widgets_pag_2()
-        self.output_frame2_banco()
-        self.output_frame2_retorno()
+        self.frame_1_pag_1()
+        self.frame_1_pag_2()
+        self.frame_2_banco()
+        self.frame_2_retorno()
         self.montaTabelas()
         self.seleciona_saida()
-        root.mainloop()
 
-    def personalisacao(self, fundo_tela='#353578', fundo='#cecef5',
-                       fundo_botao='#4545ff', borda='#6262d9', cor_texto_botao='#ffffff',
-                       tamanho_texto=8, fonte_botao='arial black', fonte_texto='verdana', tipo='bold'):
-        # Método que personaliza a aparência da tela da aplicação
-        self.fundo_tela = fundo_tela
-        self.fundo = fundo
+    def tela(self):
+        self.title('Envio de Promocoes')
+        self.geometry(None)
+        self.minsize(width=800, height=600)
 
-        self.borda = borda
-        self.fundo_botao = fundo_botao
-        self.texto_botao = cor_texto_botao
-
+    def personalizacao(self,
+                       tamanho_texto=11, fonte_botao='arial black',
+                       fonte_texto='verdana', tipo='bold'):
         self.fonte_botao = fonte_botao
         self.fonte_texto = fonte_texto
         self.tamanho = tamanho_texto
+
         self.tipo = tipo
 
-    def tela(self):
-        # Define as características básicas da janela da aplicação
-        self.root.title('Envio de Promoções')
-        self.root.configure(background=self.fundo_tela)
-        self.root.geometry('1280x1024')
-        self.root.minsize(width=800, height=600)
+    def frames_tela(self):
+        # Cria os frames da tela
+        self.frame_1 = CTkFrame(self)
+        self.frame_1.place(relx=0.02, rely=0.02, relheight=0.46, relwidth=0.96)
 
-    def frames_tela_cadastro(self):
-        # Cria os frames que irao aparecer na tela
-        self.frame_1 = Frame(self.root, bd=4, bg=self.fundo,
-                             highlightbackground=self.borda, highlightthickness=3)
-        self.frame_1.place(rely=0.02, relx=0.02, relheight=0.46, relwidth=0.96)
-
-        self.frame_2 = Frame(self.root, bd=4, bg='#ffffff',
-                             highlightbackground=self.borda, highlightthickness=3)
-        self.frame_2.place(rely=0.5, relx=0.02, relheight=0.46, relwidth=0.96)
+        self.frame_2 = CTkFrame(self)
+        self.frame_2.place(relx=0.02, rely=0.52, relheight=0.46, relwidth=0.96)
 
     def paginas(self):
-        # cria as abas da aplicaçao
-        self.abas = ttk.Notebook(self.frame_1)
-        self.abas2 = ttk.Notebook(self.frame_2)
+        # criar as abas do frame_1
+        self.abas = CTkTabview(self.frame_1)
 
-        # abas do frame_1 e suas configuraçoes
-        self.aba_cadastro = Frame(self.abas)
-        self.aba_envio = Frame(self.abas)
+        # configura as abas do frame_1
+        self.abas.add('Cadastro')
+        self.abas.add('Envio')
 
-        self.aba_cadastro.configure(background=self.fundo)
-        self.aba_envio.configure(background=self.fundo)
+        self.aba_cadastro = self.abas.tab('Cadastro')
+        self.aba_envio = self.abas.tab('Envio')
 
-        self.abas.add(self.aba_cadastro, text='Cadastro')
-        self.abas.add(self.aba_envio, text='Envio')
+        # criar as abas do frame_2
+        self.abas_2 = CTkTabview(self.frame_2)
 
-        # abas do frame_2 e suas configuraçoes
-        self.aba_banco = Frame(self.abas2)
-        self.aba_retorno_back = Frame(self.abas2)
+        # configura as abas do frame_2
+        self.abas_2.add('Banco de Dados')
+        self.abas_2.add('Retorno')
 
-        self.aba_banco.configure(background=self.fundo)
-        self.aba_retorno_back.configure(background=self.fundo)
+        self.aba_banco = self.abas_2.tab('Banco de Dados')
+        self.aba_retorno = self.abas_2.tab('Retorno')
 
-        self.abas2.add(self.aba_banco, text='Base de dados')
-        self.abas2.add(self.aba_retorno_back, text='Retorno')
-
-        self.abas.place(rely=0, relx=0, relheight=0.98, relwidth=1)
-        self.abas2.place(rely=0, relx=0, relheight=0.98, relwidth=1)
+        # Posiciona as abas na tela
+        self.abas.place(x=0, y=0, relheight=1, relwidth=1)
+        self.abas_2.place(x=0, y=0, relheight=1, relwidth=1)
 
     def botoes(self, aba):
-        # botao limpar
-        self.bt_limpar = Button(aba, text='Limpar', bd=2, bg=self.fundo_botao,
-                                fg=self.texto_botao, font=(self.fonte_botao, self.tamanho, self.tipo), command=self.limpa_tela)
-        self.bt_limpar.place(rely=0.1, relx=0.2, relheight=0.1, relwidth=0.1)
+        # limpar
+        self.bt_limpar = CTkButton(aba, text='Limpar', fg_color='#ad8a0c',
+                                   command=self.limpa_tela,
+                                   font=('arial black', 11, 'bold'))
+        self.bt_limpar.place(relx=0.2, rely=0.1, relheight=0.1, relwidth=0.1)
 
-        # botao buscar
-        self.bt_buscar = Button(aba, text='Buscar', bd=2, bg=self.fundo_botao,
-                                fg=self.texto_botao, font=(self.fonte_botao, self.tamanho, self.tipo), command=self.buscar)
-        self.bt_buscar.place(rely=0.1, relx=0.32, relheight=0.1, relwidth=0.1)
+        # buscar
+        self.bt_buscar = CTkButton(aba, text='Buscar', fg_color='#ad8a0c',
+                                   command=self.buscar,
+                                   font=('arial black', 11, 'bold'))
+        self.bt_buscar.place(relx=0.32, rely=0.1, relheight=0.1, relwidth=0.1)
 
-        # botao adicionar
-        self.bt_add = Button(aba, text='Adicionar', bd=2, bg=self.fundo_botao,
-                             fg=self.texto_botao, font=(self.fonte_botao, self.tamanho, self.tipo), command=self.add_cliente)
-        self.bt_add.place(rely=0.1, relx=0.52, relheight=0.1, relwidth=0.1)
+        # adicionar
+        self.bt_add = CTkButton(aba, text='Adicionar', fg_color='#007382',
+                                command=self.add_cliente,
+                                font=('arial black', 11, 'bold'))
+        self.bt_add.place(relx=0.52, rely=0.1, relheight=0.1, relwidth=0.1)
 
-        # botao editar
-        self.bt_editar = Button(aba, text='Editar', bd=2, bg=self.fundo_botao,
-                                fg=self.texto_botao, font=(self.fonte_botao, self.tamanho, self.tipo), command=self.editar_cliente)
-        self.bt_editar.place(rely=0.1, relx=0.72, relheight=0.1, relwidth=0.1)
+        # editar
+        self.bt_editar = CTkButton(aba, text='Editar', fg_color='#ad8a0c',
+                                   command=self.editar_cliente,
+                                   font=('arial black', 11, 'bold'))
+        self.bt_editar.place(relx=0.72, rely=0.1, relheight=0.1, relwidth=0.1)
 
-        # botao apagar
-        self.bt_apagar = Button(aba, text='Apagar', bd=2, bg=self.fundo_botao,
-                                fg=self.texto_botao, font=(self.fonte_botao, self.tamanho, self.tipo), command=self.deleta_cliente)
-        self.bt_apagar.place(rely=0.1, relx=0.84, relheight=0.1, relwidth=0.1)
+        # deletar
+        self.bt_apagar = CTkButton(aba, text='Apagar', fg_color='#ad8a0c',
+                                   command=self.deleta_cliente,
+                                   font=('arial black', 11, 'bold'))
+        self.bt_apagar.place(relx=0.84, rely=0.1, relheight=0.1, relwidth=0.1)
 
-    def widgets_pag_1(self):
-        # Cria os widgets da aba de cadastro
+    def frame_1_pag_1(self):
+        # cira os widgets da aba cadastro
         self.botoes(self.aba_cadastro)
-        # ____Entradas e labels do frame_1
+
+        # Entradas e labels
         # ID
-        self.lb_id = Label(self.aba_cadastro, text='ID',
-                           bg=self.fundo, font=(self.fonte_texto, self.tamanho))
-        self.lb_id.place(rely=0.025, relx=0.01)
-        self.entrada_id = Entry(self.aba_cadastro)
-        self.entrada_id.place(rely=0.1, relx=0.01,
+        self.lb_id = CTkLabel(self.aba_cadastro, text='ID',
+                              font=(self.fonte_texto, 8))
+        self.lb_id.place(relx=0.01, rely=0.02)
+        self.entrada_id = CTkEntry(self.aba_cadastro)
+        self.entrada_id.place(relx=0.01, rely=0.1,
                               relheight=0.1, relwidth=0.15)
+
         # Nome
-        self.lb_nome = Label(self.aba_cadastro, text='Nome',
-                             bg=self.fundo, font=(self.fonte_texto, self.tamanho))
-        self.lb_nome.place(rely=0.225, relx=0.01)
-        self.entrada_nome = Entry(self.aba_cadastro)
-        self.entrada_nome.place(rely=0.3, relx=0.01,
+        self.lb_nome = CTkLabel(self.aba_cadastro, text='Nome',
+                                font=(self.fonte_texto, 8))
+        self.lb_nome.place(relx=0.01, rely=0.22)
+        self.entrada_nome = CTkEntry(self.aba_cadastro)
+        self.entrada_nome.place(relx=0.01, rely=0.3,
                                 relheight=0.1, relwidth=0.73)
 
         # E-mail
-        self.lb_email = Label(
-            self.aba_cadastro, text='E-mail', bg=self.fundo, font=(self.fonte_texto, self.tamanho))
-        self.lb_email.place(rely=0.425, relx=0.01)
-        self.entrada_email = Entry(self.aba_cadastro)
+        self.lb_email = CTkLabel(self.aba_cadastro, text='E-mail',
+                                 font=(self.fonte_texto, 8))
+        self.lb_email.place(relx=0.01, rely=0.42)
+        self.entrada_email = CTkEntry(self.aba_cadastro)
         self.entrada_email.place(
-            rely=0.5, relx=0.01, relheight=0.1, relwidth=0.73)
+            relx=0.01, rely=0.5, relheight=0.1, relwidth=0.73)
 
-        # Data Nascimento
-        self.lb_nasc = Label(self.aba_cadastro, text='Data de Nascimento',
-                             bg=self.fundo, font=(self.fonte_texto, self.tamanho))
-        self.lb_nasc.place(rely=0.625, relx=0.01)
-        self.entrada_nasc = Entry(self.aba_cadastro)
-        self.entrada_nasc.place(
-            rely=0.7, relx=0.01, relheight=0.1, relwidth=0.2)
+        # Data de Nascimento
+        self.lb_nasc = CTkLabel(self.aba_cadastro, text='Data de Nascimento',
+                                font=(self.fonte_texto, 8))
+        self.lb_nasc.place(relx=0.01, rely=0.62)
+        self.entrada_nasc = CTkEntry(self.aba_cadastro)
+        self.entrada_nasc.place(relx=0.01, rely=0.7,
+                                relheight=0.1, relwidth=0.2)
 
         # CPF
-        self.lb_cpf = Label(self.aba_cadastro, text='CPF',
-                            bg=self.fundo, font=(self.fonte_texto, self.tamanho))
-        self.lb_cpf.place(rely=0.625, relx=0.25)
-        self.entrada_cpf = Entry(self.aba_cadastro)
-        self.entrada_cpf.place(
-            rely=0.7, relx=0.25, relheight=0.1, relwidth=0.2)
+        self.lb_cpf = CTkLabel(self.aba_cadastro, text='CPF',
+                               font=(self.fonte_texto, 8))
+        self.lb_cpf.place(relx=0.25, rely=0.62)
+        self.entrada_cpf = CTkEntry(self.aba_cadastro)
+        self.entrada_cpf.place(relx=0.25, rely=0.7,
+                               relheight=0.1, relwidth=0.2)
 
         # Whatsapp
-        self.lb_wpp = Label(
-            self.aba_cadastro, text='Contato WhatsApp', bg=self.fundo, font=(self.fonte_texto, self.tamanho))
-        self.lb_wpp.place(rely=0.625, relx=0.5)
-        self.entrada_wpp = Entry(self.aba_cadastro)
-        self.entrada_wpp.place(
-            rely=0.7, relx=0.5, relheight=0.1, relwidth=0.2)
+        self.lb_wpp = CTkLabel(self.aba_cadastro, text='Contato WhatsApp',
+                               font=(self.fonte_texto, 8))
+        self.lb_wpp.place(relx=0.5, rely=0.62)
+        self.entrada_wpp = CTkEntry(self.aba_cadastro)
+        self.entrada_wpp.place(relx=0.5, rely=0.7, relheight=0.1, relwidth=0.2)
 
         # Data da Ultima Compra
-        self.lb_data = Label(self.aba_cadastro, text='Última Compra',
-                             bg=self.fundo, font=(self.fonte_texto, self.tamanho))
-        self.lb_data.place(rely=0.825, relx=0.01)
-        self.entrada_data = Entry(self.aba_cadastro)
-        self.entrada_data.place(
-            rely=0.875, relx=0.01, relheight=0.1, relwidth=0.2)
+        self.lb_data = CTkLabel(self.aba_cadastro, text='Última Compra',
+                                font=(self.fonte_texto, 8))
+        self.lb_data.place(relx=0.01, rely=0.82)
+        self.entrada_data = CTkEntry(self.aba_cadastro)
+        self.entrada_data.place(relx=0.01, rely=0.9,
+                                relheight=0.1, relwidth=0.2)
 
         # Pedidos
-        self.lb_pedidos = Label(self.aba_cadastro, text='Nº de Pedidos',
-                                bg=self.fundo, font=(self.fonte_texto, self.tamanho))
-        self.lb_pedidos.place(rely=0.825, relx=0.25)
-        self.entrada_pedidos = Entry(self.aba_cadastro)
+        self.lb_pedidos = CTkLabel(self.aba_cadastro, text='Pedidos',
+                                   font=(self.fonte_texto, 8))
+        self.lb_pedidos.place(relx=0.25, rely=0.82)
+        self.entrada_pedidos = CTkEntry(self.aba_cadastro)
         self.entrada_pedidos.place(
-            rely=0.875, relx=0.25, relheight=0.1, relwidth=0.2)
+            relx=0.25, rely=0.9, relheight=0.1, relwidth=0.2)
 
-        # Satisfaçao
-        self.lb_satis = Label(self.aba_cadastro, text='Satisfação',
-                              bg=self.fundo, font=(self.fonte_texto, self.tamanho))
-        self.lb_satis.place(rely=0.825, relx=0.5)
-        self.entrada_satis = Entry(self.aba_cadastro)
+        # Satisfacao
+        self.lb_satis = CTkLabel(self.aba_cadastro, text='Satisfação',
+                                 font=(self.fonte_texto, 8))
+        self.lb_satis.place(relx=0.5, rely=0.82)
+        self.entrada_satis = CTkEntry(self.aba_cadastro)
         self.entrada_satis.place(
-            rely=0.875, relx=0.5, relheight=0.1, relwidth=0.2)
+            relx=0.5, rely=0.9, relheight=0.1, relwidth=0.2)
 
-    def widgets_pag_2(self):
-        # Cria os widgets da aba de envio de mensagens
+    def botoes_2(self):
         # botao upload de imagem/video
-        self.bt_upload = Button(self.aba_envio, text='Enviar Imagem', bd=2, bg=self.fundo_botao,
-                                fg=self.texto_botao, font=(self.fonte_botao, self.tamanho, self.tipo), command=self.abrir)
-        self.bt_upload.place(rely=0.05, relx=0.7, relheight=0.1, relwidth=0.1)
+        self.bt_upload = CTkButton(self.aba_envio, command=self.abrir,
+                                   text='Enviar Imagem', fg_color='#ad8a0c',
+                                   font=('arial black', 11, 'bold'))
+        self.bt_upload.place(relx=0.7, rely=0.025, relheight=0.1, relwidth=0.1)
 
         # botao limpar
-        self.bt_limpar = Button(self.aba_envio, text='Limpar', bd=2, bg=self.fundo_botao,
-                                fg=self.texto_botao, font=(self.fonte_botao, self.tamanho, self.tipo), command=self.limpa_tela)
-        self.bt_limpar.place(rely=0.9, relx=0.9, relheight=0.1, relwidth=0.1)
+        self.bt_limpar = CTkButton(self.aba_envio, command=self.limpa_tela,
+                                   text='Limpar', fg_color='#ad8a0c',
+                                   font=('arial black', 11, 'bold'))
+        self.bt_limpar.place(relx=0.9, rely=0.9, relheight=0.1, relwidth=0.1)
 
         # botao enviar
-        self.bt_enviar = Button(self.aba_envio, text='Enviar', bd=2, bg=self.fundo_botao,
-                                fg=self.texto_botao, font=(self.fonte_botao, self.tamanho, self.tipo), command=self.envia_msg)
-        self.bt_enviar.place(rely=0.9, relx=0.7, relheight=0.1, relwidth=0.1)
+        self.bt_enviar = CTkButton(self.aba_envio, command=self.envia_msg,
+                                   text='Enviar', fg_color='#ad8a0c',
+                                   font=('arial black', 11, 'bold'))
+        self.bt_enviar.place(relx=0.7, rely=0.9, relheight=0.1, relwidth=0.1)
 
         # botao filtar
-        
+
         # botao parar
 
+    def frame_1_pag_2(self):
+        self.botoes_2()
+        # Cria os widgets da aba de envio de mensagens
         # entrada da mensagem a ser enviada
-        self.lb_msg = Label(self.aba_envio, text='Digite a mensagem a ser enviada: ',
-                            bg=self.fundo, font=(self.fonte_texto, self.tamanho))
-        self.lb_msg.place(rely=0.05, relx=0.01)
-        self.entrada_mensagem = Entry(self.aba_envio)
+        self.lb_msg = CTkLabel(self.aba_envio, text='Digite a mensagem a ser enviada: ',
+                               font=(self.fonte_texto, 8))
+        self.lb_msg.place(relx=0.01, rely=0.05)
+        self.entrada_mensagem = CTkEntry(self.aba_envio)
         self.entrada_mensagem.place(
-            rely=0.15, relx=0.01, relheight=0.7, relwidth=0.93)
+            relx=0.01, rely=0.15, relheight=0.7, relwidth=0.93)
 
-    def output_frame2_banco(self):
+    def frame_2_banco(self):
         # retorno do banco de dados
         # ID;Nome;E-mail;"Data de nascimento";CPF/CNPJ;Telefone;"Última compra";Pedidos;Satisfação
         self.saida = ttk.Treeview(self.aba_banco, height=1, columns=(
@@ -625,7 +626,7 @@ class Application(funcoesClientes, Up_Down):
 
         self.saida.place(rely=0.1, relx=0.01, relheight=0.85, relwidth=0.95)
 
-        self.scroolLista = Scrollbar(self.frame_2, orient='vertical')
+        self.scroolLista = Scrollbar(self.aba_banco, orient='vertical')
         self.saida.configure(yscroll=self.scroolLista.set)
         self.scroolLista.place(rely=0.1, relx=0.96,
                                relheight=0.85, relwidth=0.04)
@@ -635,15 +636,15 @@ class Application(funcoesClientes, Up_Down):
         self.saida.bind("<Return>", self.abre_cliente)
         self.saida.bind("<Button-1>", self.ordena)
 
-    def output_frame2_retorno(self):
+    def frame_2_retorno(self):
         # Cria a área de texto
-        self.output2 = Text(self.aba_retorno_back, bg=self.fundo, wrap=WORD, font=(self.fonte_texto, self.tamanho),
-                            yscrollcommand=self.scroolLista.set, spacing1=5)
-        self.output2.place(rely=0.1, relx=0.01, relheight=0.85, relwidth=0.95)
+        self.output2 = CTkTextbox(self.aba_retorno)
+        self.output2.place(rely=0.1, relx=0.01,
+                            relheight=0.85, relwidth=0.95)
 
     def menus(self):
-        barraMenu = Menu(self.root)
-        self.root.config(menu=barraMenu)
+        barraMenu = Menu(self)
+        self.config(menu=barraMenu)
         abamenu = Menu(barraMenu)
         abamenu2 = Menu(barraMenu)
 
@@ -655,7 +656,8 @@ class Application(funcoesClientes, Up_Down):
         abamenu.add_command(label='Upload', command=self.Upload)
         abamenu.add_command(label='Donwload')
         abamenu.add_command(label='Sair', command=Quit)
-        abamenu2.add_command(label='Modo de Usar', command=Quit)
+        abamenu2.add_command(label='Modo de Usar')
 
-
-Application()
+if __name__ == '__main__':
+    root = Application()
+    root.mainloop()
